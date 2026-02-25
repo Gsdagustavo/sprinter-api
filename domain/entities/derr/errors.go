@@ -15,4 +15,5 @@ var (
 	InvalidEmail       = NewClientError("INVALID_EMAIL", "invalid email")
 	InvalidPassword    = NewClientError("INVALID_PASSWORD", "invalid password")
 	InvalidCredentials = NewClientError("INVALID_CREDENTIALS", "invalid credentials")
+	UserAlreadyExists  = NewClientError("USER_ALREADY_EXISTS", "user already exists")
 )

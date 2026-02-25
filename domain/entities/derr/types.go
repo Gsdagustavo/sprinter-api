@@ -51,5 +51,5 @@ func NewBadRequestError(message string) ClientError {
 }
 
 func JoinInternalError(err error, message string) error {
-	return errors.Join(err, errors.New(message))
+	return NewInternalError(errors.Join(errors.New(message), err).Error())
 }

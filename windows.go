@@ -121,14 +121,14 @@ func configureOutput(logFolder string) (*os.File, error) {
 	now := time.Now()
 	logName := fmt.Sprintf("%s/%s.log", logFolder, now.Format("20060102150405"))
 
+	err := os.MkdirAll(logFolder, os.ModePerm)
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to create log folder"))
+	}
+
 	file, err := os.OpenFile(logName, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		if os.IsNotExist(err) {
-			err = os.MkdirAll(logFolder, os.ModePerm)
-			if err != nil {
-				return nil, errors.Join(errors.New("failed to create log folder"))
-			}
-
 			err = os.WriteFile(logName, []byte(""), os.ModePerm)
 			if err != nil {
 				return nil, errors.Join(errors.New("failed to create log file"))

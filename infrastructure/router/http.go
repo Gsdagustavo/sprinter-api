@@ -25,54 +25,45 @@ func Write(w http.ResponseWriter, v any) error {
 	return nil
 }
 
-func WriteInternalError(w http.ResponseWriter) {
-	http.Error(w, "Internal server error", http.StatusInternalServerError)
-}
-
-func WriteBadRequest(w http.ResponseWriter) {
-	http.Error(w, "Bad request", http.StatusBadRequest)
-}
-
-func WriteUnauthorized(w http.ResponseWriter) {
-	http.Error(w, "Unauthorized", http.StatusUnauthorized)
-}
-
-func WriteForbidden(w http.ResponseWriter) {
-	http.Error(w, "Forbidden", http.StatusForbidden)
-}
-
 func HandleError(w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
-
-	response, err := json.Marshal(err)
-	if err != nil {
-		slog.Error("failed to marshal error response body", logger.Err(err))
-		return
-	}
 
 	var clientErr derr.ClientError
 	if errors.As(err, &clientErr) {
 		w.WriteHeader(http.StatusBadRequest)
-		_, e := w.Write(response)
+		response, e := json.Marshal(clientErr)
+		if e != nil {
+			slog.Error("failed to marshal client error response body", logger.Err(e))
+			return
+		}
+		_, e = w.Write(response)
 		if e != nil {
 			slog.Error("failed to write client error response body", logger.Err(e))
 		}
 		return
 	}
 
-	var repositoryError derr.RepositoryError
-	if errors.As(err, &repositoryError) {
+	var repositoryErr derr.RepositoryError
+	if errors.As(err, &repositoryErr) {
+		sanitized := derr.InternalServerError
 		w.WriteHeader(http.StatusInternalServerError)
-		_, e := w.Write(response)
+		response, e := json.Marshal(sanitized)
+		if e != nil {
+			slog.Error("failed to marshal repository error response body", logger.Err(e))
+			return
+		}
+		_, e = w.Write(response)
 		if e != nil {
 			slog.Error("failed to write repository error response body", logger.Err(e))
 		}
 		return
 	}
 
+	sanitized := derr.InternalServerError
 	w.WriteHeader(http.StatusInternalServerError)
+	response, _ := json.Marshal(sanitized)
 	_, e := w.Write(response)
 	if e != nil {
-		slog.Error("failed to write repository error response body", logger.Err(e))
+		slog.Error("failed to write fallback error response body", logger.Err(e))
 	}
 }

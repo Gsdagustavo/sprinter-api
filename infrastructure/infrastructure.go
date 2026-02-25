@@ -28,7 +28,7 @@ func SetupModules(r *mux.Router, config entities.Config) error {
 	authUseCases := usecases.NewAuthenticationUseCase(authRepository, config.Paseto.SecurityKey)
 
 	// Modules
-	authModule := modules.NewAuthModule(*authUseCases)
+	authModule := modules.NewAuthModule(authUseCases)
 
 	apiSubRouter := r.PathPrefix("/api").Subrouter()
 

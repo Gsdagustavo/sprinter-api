@@ -14,7 +14,9 @@ type hdFileStorage struct {
 	storageFolder string
 }
 
-func NewHDFileStorage(config entities.Config) filestore.FileStorage {
+func NewHDFileStorage(
+	config entities.Config,
+) filestore.FileStorage {
 	fileStorage := hdFileStorage{
 		storageFolder: config.FileStorage.StorageFolder,
 	}

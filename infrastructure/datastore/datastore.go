@@ -22,17 +22,24 @@ type RepositorySettings interface {
 
 // AuthRepository defines methods for user authentication and registration.
 type AuthRepository interface {
-	// AttemptLogin tries to log in with the given credentials
-	AttemptLogin(
+	// GetUserByEmail returns the user with the given email
+	GetUserByEmail(
 		ctx context.Context,
-		credentials entities.UserCredentials,
-	) (int64, bool, error)
+		email string,
+	) (*entities.User, error)
+
+	// CheckValidPassword returns whether the given password is valid for the user with the given ID
+	CheckValidPassword(
+		ctx context.Context,
+		userID int64,
+		password string,
+	) (bool, error)
 
 	// AttemptRegister tries to register a new user with the given credentials
 	AttemptRegister(
 		ctx context.Context,
 		credentials entities.UserCredentials,
-	) (int64, bool, error)
+	) (int64, error)
 }
 
 // ProductRepository defines methods for managing product data.

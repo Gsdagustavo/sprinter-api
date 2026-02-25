@@ -23,41 +23,63 @@ func NewAuthenticationRepository(settings datastore.RepositorySettings) datastor
 	}
 }
 
-func (r authenticationRepository) AttemptLogin(
+func (r authenticationRepository) GetUserByEmail(
 	ctx context.Context,
-	credentials entities.UserCredentials,
-) (int64, bool, error) {
+	email string,
+) (*entities.User, error) {
 	const query = `
-		SELECT id, password FROM users WHERE email = ?
+	SELECT 
+    	id, 
+    	name, 
+    	email,  
+    	carbo_coins, 
+    	carbon, 
+    	traveled_distance 
+	FROM users WHERE email = ?
 	`
 
-	var userID int64
-	var passwordHash string
-	err := r.conn.QueryRowContext(ctx, query, credentials.Email).Scan(&userID, &passwordHash)
+	var user entities.User
+	row := r.conn.QueryRowContext(ctx, query, email)
+	err := row.Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.CarboCoins,
+		&user.Carbon,
+		&user.TraveledDistance,
+	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return -1, false, derr.NewBadRequestError("invalid credentials")
+			return nil, derr.NotFoundError
 		}
 
-		return -1, false, derr.NewInternalError("failed to scan password")
+		return nil, derr.JoinInternalError(err, "failed to scan")
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(credentials.Password))
+	return &user, nil
+}
+
+func (r authenticationRepository) CheckValidPassword(
+	ctx context.Context,
+	userID int64,
+	password string,
+) (bool, error) {
+	const query = `SELECT id, password FROM users WHERE id = ?`
+
+	var passwordHash string
+	err := r.conn.QueryRowContext(ctx, query, userID).Scan(&userID, &passwordHash)
 	if err != nil {
-		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return -1, false, derr.NewBadRequestError("invalid credentials")
-		}
-
-		return -1, false, derr.NewInternalError("failed to compare password with hash")
+		return false, derr.NewInternalError("failed to scan password")
 	}
 
-	return userID, true, nil
+	err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
+	return err != nil, nil
 }
 
 func (r authenticationRepository) AttemptRegister(
 	ctx context.Context,
 	credentials entities.UserCredentials,
-) (int64, bool, error) {
+) (int64, error) {
 	const query = `INSERT INTO users (name, email, password) VALUES (?, ?, ?, ?)`
 
 	result, err := r.conn.ExecContext(
@@ -68,13 +90,13 @@ func (r authenticationRepository) AttemptRegister(
 		credentials.Password,
 	)
 	if err != nil {
-		return -1, false, derr.NewInternalError("failed to execute query")
+		return -1, derr.NewInternalError("failed to execute query")
 	}
 
 	userID, err := result.LastInsertId()
 	if err != nil {
-		return -1, false, derr.NewInternalError("failed to get last inserted ID")
+		return -1, derr.NewInternalError("failed to get last inserted ID")
 	}
 
-	return userID, true, nil
+	return userID, nil
 }

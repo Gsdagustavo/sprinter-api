@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"errors"
 
 	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
 	"github.com/VitorFranciscoDev/sprinter-api/domain/entities/derr"
@@ -15,19 +16,17 @@ type AuthenticationUseCase struct {
 	securityKey string
 }
 
-// NewAuthenticationUseCase instantiates a new Auth Use Case
 func NewAuthenticationUseCase(
 	r datastore.AuthRepository,
 	securityKey string,
-) *AuthenticationUseCase {
-	return &AuthenticationUseCase{
+) AuthenticationUseCase {
+	return AuthenticationUseCase{
 		repository:  r,
 		securityKey: securityKey,
 	}
 }
 
-// AttemptLogin attempt to log in a user with the given credentials
-func (a *AuthenticationUseCase) AttemptLogin(
+func (a AuthenticationUseCase) AttemptLogin(
 	ctx context.Context,
 	credentials entities.UserCredentials,
 ) (*entities.AuthenticationResponse, error) {
@@ -35,16 +34,25 @@ func (a *AuthenticationUseCase) AttemptLogin(
 		return nil, derr.InvalidCredentials
 	}
 
-	userID, didLogin, err := a.repository.AttemptLogin(ctx, credentials)
+	userByEmail, err := a.repository.GetUserByEmail(ctx, credentials.Email)
+	if err != nil && !errors.Is(err, derr.NotFoundError) {
+		return nil, derr.JoinInternalError(err, "failed to get user by email")
+	}
+
+	if userByEmail == nil {
+		return nil, derr.InvalidCredentials
+	}
+
+	valid, err := a.repository.CheckValidPassword(ctx, userByEmail.ID, credentials.Password)
 	if err != nil {
 		return nil, derr.JoinInternalError(err, "login attempt failed")
 	}
 
-	if !didLogin {
+	if !valid {
 		return nil, derr.InvalidCredentials
 	}
 
-	token, err := util.GetNewAuthToken(userID, a.securityKey)
+	token, err := util.GetNewAuthToken(userByEmail.ID, a.securityKey)
 	if err != nil {
 		return nil, derr.JoinInternalError(err, "failed to generate token")
 	}
@@ -52,8 +60,7 @@ func (a *AuthenticationUseCase) AttemptLogin(
 	return &entities.AuthenticationResponse{Token: token}, nil
 }
 
-// AttemptRegister attempt to register a new user with the given credentials
-func (a *AuthenticationUseCase) AttemptRegister(
+func (a AuthenticationUseCase) AttemptRegister(
 	ctx context.Context,
 	credentials entities.UserCredentials,
 ) (*entities.AuthenticationResponse, error) {
@@ -65,13 +72,19 @@ func (a *AuthenticationUseCase) AttemptRegister(
 		return nil, derr.InvalidCredentials
 	}
 
-	userID, didRegister, err := a.repository.AttemptLogin(ctx, credentials)
-	if err != nil {
-		return nil, derr.JoinInternalError(err, "register attempt failed")
+	// Check if a user with the email already exists in the database
+	userByEmail, err := a.repository.GetUserByEmail(ctx, credentials.Email)
+	if err != nil && !errors.Is(err, derr.NotFoundError) {
+		return nil, derr.JoinInternalError(err, "failed to get user by email")
 	}
 
-	if !didRegister {
-		return nil, derr.InvalidCredentials
+	if userByEmail != nil {
+		return nil, derr.UserAlreadyExists
+	}
+
+	userID, err := a.repository.AttemptRegister(ctx, credentials)
+	if err != nil {
+		return nil, derr.JoinInternalError(err, "register attempt failed")
 	}
 
 	token, err := util.GetNewAuthToken(userID, a.securityKey)
