@@ -1,0 +1,22 @@
+LogDir = "./runtime/logs"
+ServiceAccountKeyPath = ""
+Environment = "development"
+integrationToken = "123456"
+
+[Server]
+port = 8080
+host = "localhost"
+
+[Database]
+host = "localhost"
+port = "3308"
+name = "sprinter_db"
+user = "root"
+password = "root"
+
+[Paseto]
+paseto_security_key = "b7e16bf2-ab0f-4a68-a16b-f2ab0f6a"
+user_pass_salt_secret = "2b083255-6564-44fb-8832-55656414"
+
+[FileStorage]
+storage_folder = "./runtime/storage"

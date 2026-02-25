@@ -1,0 +1,66 @@
+package datastore
+
+import (
+	"context"
+	"database/sql"
+	"time"
+
+	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
+)
+
+// RepositorySettings creates and manages the access for the database
+type RepositorySettings interface {
+	// Connection returns a database connection
+	Connection() *sql.DB
+
+	// Dismount closes all connections with the database
+	Dismount() error
+
+	// ServerTime returns the current time on the server
+	ServerTime(ctx context.Context) (*time.Time, error)
+}
+
+// AuthRepository defines methods for user authentication and registration.
+type AuthRepository interface {
+	// AttemptLogin tries to log in with the given credentials
+	AttemptLogin(
+		ctx context.Context,
+		credentials entities.UserCredentials,
+	) (int64, bool, error)
+
+	// AttemptRegister tries to register a new user with the given credentials
+	AttemptRegister(
+		ctx context.Context,
+		credentials entities.UserCredentials,
+	) (int64, bool, error)
+}
+
+// ProductRepository defines methods for managing product data.
+type ProductRepository interface {
+	// Add is trying to add a new product
+	Add(ctx context.Context, product *entities.Product) error
+
+	// Delete is trying to delete a product
+	Delete(ctx context.Context, id int64) error
+
+	// Update is trying to update a product
+	Update(ctx context.Context, product *entities.Product) error
+
+	// Get is trying to get one single product
+	Get(ctx context.Context, id int64) (*entities.Product, error)
+
+	// GetAll is trying to get all products
+	GetAll(ctx context.Context) ([]*entities.Product, error)
+}
+
+// ActivityRepository defines methods for managing activity data.
+type ActivityRepository interface {
+	// Save is trying to save the activity
+	Save(ctx context.Context, activity *entities.Activity) error
+
+	// Get is trying to get an activity information
+	Get(ctx context.Context, id int64) (*entities.Activity, error)
+
+	// GetAll is trying to get all activities
+	GetAll(ctx context.Context) ([]*entities.Activity, error)
+}
