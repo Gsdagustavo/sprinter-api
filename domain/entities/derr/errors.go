@@ -1,19 +1,19 @@
 package derr
 
 var (
-	BadRequestError     = NewClientError("BAD_REQUEST", "bad request")
-	UnauthorizedError   = NewClientError("UNAUTHORIZED", "unauthorized")
-	NotFoundError       = NewClientError("NOT FOUND", "not found")
-	InternalServerError = NewRepositoryError("INTERNAL_SERVER_ERROR", "internal server error")
+	BadRequestError     = NewClientError("BAD_REQUEST", "Bad Request")
+	UnauthorizedError   = NewClientError("UNAUTHORIZED", "Unauthorized")
+	NotFoundError       = NewClientError("NOT FOUND", "Not Found")
+	InternalServerError = NewRepositoryError("INTERNAL_SERVER_ERROR", "Internal Server Error")
 )
 
 var (
-	InvalidParameterError = NewClientError("INVALID_PARAMETER", "invalid parameter")
+	InvalidParameterError = NewClientError("INVALID_PARAMETER", "Invalid Parameter")
 )
 
 var (
-	InvalidEmail       = NewClientError("INVALID_EMAIL", "invalid email")
-	InvalidPassword    = NewClientError("INVALID_PASSWORD", "invalid password")
-	InvalidCredentials = NewClientError("INVALID_CREDENTIALS", "invalid credentials")
-	UserAlreadyExists  = NewClientError("USER_ALREADY_EXISTS", "user already exists")
+	InvalidEmail       = NewClientError("INVALID_EMAIL", "Invalid email")
+	InvalidPassword    = NewClientError("INVALID_PASSWORD", "Invalid password")
+	InvalidCredentials = NewClientError("INVALID_CREDENTIALS", "Invalid credentials")
+	UserAlreadyExists  = NewClientError("USER_ALREADY_EXISTS", "User already exists")
 )

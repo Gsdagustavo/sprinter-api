@@ -10,6 +10,18 @@ import (
 	"github.com/VitorFranciscoDev/sprinter-api/domain/logger"
 )
 
+type SuccessfulResponse struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+func NewSuccessfulResponse() SuccessfulResponse {
+	return SuccessfulResponse{
+		Code:    "SUCCESS",
+		Message: "success",
+	}
+}
+
 func Write(w http.ResponseWriter, v any) error {
 	bytes, err := json.Marshal(v)
 	if err != nil {

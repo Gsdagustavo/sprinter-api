@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/VitorFranciscoDev/sprinter-api/domain"
 	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
 	"github.com/VitorFranciscoDev/sprinter-api/domain/entities/derr"
 	"github.com/VitorFranciscoDev/sprinter-api/domain/rules"
@@ -11,22 +12,22 @@ import (
 	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/datastore"
 )
 
-type AuthenticationUseCase struct {
-	repository  datastore.AuthRepository
-	securityKey string
-}
-
 func NewAuthenticationUseCase(
 	r datastore.AuthRepository,
 	securityKey string,
-) AuthenticationUseCase {
-	return AuthenticationUseCase{
+) domain.AuthenticationUseCase {
+	return authenticationUseCase{
 		repository:  r,
 		securityKey: securityKey,
 	}
 }
 
-func (a AuthenticationUseCase) AttemptLogin(
+type authenticationUseCase struct {
+	repository  datastore.AuthRepository
+	securityKey string
+}
+
+func (a authenticationUseCase) AttemptLogin(
 	ctx context.Context,
 	credentials entities.UserCredentials,
 ) (*entities.AuthenticationResponse, error) {
@@ -60,7 +61,7 @@ func (a AuthenticationUseCase) AttemptLogin(
 	return &entities.AuthenticationResponse{Token: token}, nil
 }
 
-func (a AuthenticationUseCase) AttemptRegister(
+func (a authenticationUseCase) AttemptRegister(
 	ctx context.Context,
 	credentials entities.UserCredentials,
 ) (*entities.AuthenticationResponse, error) {
@@ -93,4 +94,18 @@ func (a AuthenticationUseCase) AttemptRegister(
 	}
 
 	return &entities.AuthenticationResponse{Token: token}, nil
+}
+
+func (a authenticationUseCase) GetUserByEmail(
+	ctx context.Context,
+	email string,
+) (*entities.User, error) {
+	return a.repository.GetUserByEmail(ctx, email)
+}
+
+func (a authenticationUseCase) CheckCredentials(
+	ctx context.Context,
+	credentials entities.UserCredentials,
+) (bool, error) {
+	return a.repository.CheckUserCredentials(ctx, credentials)
 }

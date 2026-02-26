@@ -9,6 +9,7 @@ import (
 	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
 	"github.com/VitorFranciscoDev/sprinter-api/domain/usecases"
 	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/datastore/repositories"
+	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/filestore/hdstore"
 	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/router"
 	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/router/modules"
 	"github.com/gorilla/mux"
@@ -21,11 +22,14 @@ func SetupModules(r *mux.Router, config entities.Config) error {
 		return errors.Join(errors.New("failed to create settings repository"), err)
 	}
 
+	fileStorage := hdstore.NewHDFileStorage(config)
+
 	// Repositories
 	authRepository := repositories.NewAuthenticationRepository(settings)
 
 	// Use Cases
 	authUseCases := usecases.NewAuthenticationUseCase(authRepository, config.Paseto.SecurityKey)
+	_ = usecases.NewUserUseCases(fileStorage, config.FileStorage.StorageFolder)
 
 	// Modules
 	authModule := modules.NewAuthModule(authUseCases)
