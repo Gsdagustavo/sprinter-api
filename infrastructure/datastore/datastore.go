@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 )
 
 // RepositorySettings creates and manages the access for the database
@@ -28,18 +28,23 @@ type AuthRepository interface {
 		email string,
 	) (*entities.User, error)
 
-	// CheckValidPassword returns whether the given password is valid for the user with the given ID
-	CheckValidPassword(
+	// GetUserByID returns the user with the given ID
+	GetUserByID(
 		ctx context.Context,
 		userID int64,
-		password string,
-	) (bool, error)
+	) (*entities.User, error)
 
 	// AttemptRegister tries to register a new user with the given credentials
 	AttemptRegister(
 		ctx context.Context,
 		credentials entities.UserCredentials,
 	) (int64, error)
+
+	// CheckUserCredentials validates the user credentials
+	CheckUserCredentials(
+		ctx context.Context,
+		credentials entities.UserCredentials,
+	) (bool, error)
 }
 
 // ProductRepository defines methods for managing product data.

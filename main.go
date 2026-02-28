@@ -10,9 +10,9 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/logger"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/logger"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )

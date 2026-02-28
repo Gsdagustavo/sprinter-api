@@ -3,7 +3,7 @@ package domain
 import (
 	"context"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 )
 
 // AuthenticationUseCase defines a use case interface with methods related to user authentication
@@ -31,6 +31,12 @@ type AuthenticationUseCase interface {
 		ctx context.Context,
 		credentials entities.UserCredentials,
 	) (bool, error)
+
+	// GetUserByToken returns the user with the given authentication token
+	GetUserByToken(
+		ctx context.Context,
+		token string,
+	) (*entities.User, error)
 }
 
 // UserUseCase defines a use case interface with methods related to user managing

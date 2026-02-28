@@ -4,7 +4,7 @@ import (
 	"net/mail"
 	"unicode"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 )
 
 // Password rules

@@ -3,13 +3,12 @@ package repositories
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/datastore"
-
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -34,7 +33,7 @@ func (s settingsRepository) Connection() *sql.DB {
 func (s settingsRepository) Dismount() error {
 	err := s.connection.Close()
 	if err != nil {
-		return errors.Join(errors.New("failed to close database connection"), err)
+		return derr.JoinInternalError(err, "failed to close database connection")
 	}
 
 	return nil
@@ -49,7 +48,7 @@ func (s settingsRepository) ServerTime(
 	var serverTime time.Time
 	err := s.connection.QueryRowContext(ctx, query).Scan(&serverTime)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to get server time"), err)
+		return nil, derr.JoinInternalError(err, "failed to get server time")
 	}
 
 	return &serverTime, nil
@@ -72,7 +71,7 @@ func setupConnection(config entities.Config) (*sql.DB, error) {
 
 	db, err := sql.Open("mysql", connection)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to open database connection"), err)
+		return nil, derr.JoinInternalError(err, "failed to open database connection")
 	}
 
 	db.SetMaxOpenConns(800)

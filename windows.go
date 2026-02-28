@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/kardianos/service"
 )
 
@@ -95,8 +95,8 @@ func loadFlags() (string, string, bool) {
 	var terminal bool
 
 	// Try to read the configuration file from the command line arguments
-	flag.StringVar(&cfgPath, "configs", "", "the path to the application config file")
-	flag.StringVar(&action, "action", "", "the action to execute")
+	flag.StringVar(&cfgPath, "configs", "settings/dev-settings.toml", "the path to the application config file")
+	flag.StringVar(&action, "action", "run", "the action to execute")
 	flag.BoolVar(&terminal, "terminal", false, "display the logs in the terminal instead of in the log files")
 	flag.Parse()
 

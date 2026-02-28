@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities/derr"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/rules"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/util"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/datastore"
+	"github.com/Gsdagustavo/sprinter-api/domain"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
+	"github.com/Gsdagustavo/sprinter-api/domain/rules"
+	"github.com/Gsdagustavo/sprinter-api/domain/util"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
 )
 
 func NewAuthenticationUseCase(
@@ -44,7 +44,7 @@ func (a authenticationUseCase) AttemptLogin(
 		return nil, derr.InvalidCredentials
 	}
 
-	valid, err := a.repository.CheckValidPassword(ctx, userByEmail.ID, credentials.Password)
+	valid, err := a.repository.CheckUserCredentials(ctx, credentials)
 	if err != nil {
 		return nil, derr.JoinInternalError(err, "login attempt failed")
 	}
@@ -83,6 +83,13 @@ func (a authenticationUseCase) AttemptRegister(
 		return nil, derr.UserAlreadyExists
 	}
 
+	hashedPassword, err := util.Hash(credentials.Password)
+	if err != nil {
+		return nil, derr.JoinInternalError(err, "failed to hash password")
+	}
+
+	credentials.Password = hashedPassword
+
 	userID, err := a.repository.AttemptRegister(ctx, credentials)
 	if err != nil {
 		return nil, derr.JoinInternalError(err, "register attempt failed")
@@ -108,4 +115,20 @@ func (a authenticationUseCase) CheckCredentials(
 	credentials entities.UserCredentials,
 ) (bool, error) {
 	return a.repository.CheckUserCredentials(ctx, credentials)
+}
+
+func (a authenticationUseCase) GetUserByToken(
+	ctx context.Context,
+	token string,
+) (*entities.User, error) {
+	id, expired, err := util.GetUserIDFromToken(token, a.securityKey)
+	if err != nil {
+		return nil, derr.JoinInternalError(err, "failed to get user ID from token")
+	}
+
+	if expired {
+		return nil, derr.NewUnauthorizedError("unauthorized")
+	}
+
+	return a.repository.GetUserByID(ctx, int64(id))
 }

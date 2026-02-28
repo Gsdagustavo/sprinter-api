@@ -1,5 +1,4 @@
-
-module github.com/VitorFranciscoDev/sprinter-api
+module github.com/Gsdagustavo/sprinter-api
 
 go 1.25.4
 
@@ -22,6 +21,6 @@ require (
 	github.com/kardianos/service v1.2.4 // indirect
 	github.com/o1egl/paseto v1.0.0 // indirect
 	github.com/pkg/errors v0.8.0 // indirect
-	go.uber.org/multierr v1.10.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
 )

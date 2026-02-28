@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 )
 
 type userKey string

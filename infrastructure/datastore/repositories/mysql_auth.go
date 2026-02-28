@@ -5,10 +5,10 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities/derr"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/datastore"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
+	"github.com/Gsdagustavo/sprinter-api/domain/util"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
 )
 
 type authenticationRepository struct {
@@ -59,28 +59,11 @@ func (r authenticationRepository) GetUserByEmail(
 	return &user, nil
 }
 
-func (r authenticationRepository) CheckValidPassword(
-	ctx context.Context,
-	userID int64,
-	password string,
-) (bool, error) {
-	const query = `SELECT id, password FROM users WHERE id = ?`
-
-	var passwordHash string
-	err := r.conn.QueryRowContext(ctx, query, userID).Scan(&userID, &passwordHash)
-	if err != nil {
-		return false, derr.NewInternalError("failed to scan password")
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
-	return err != nil, nil
-}
-
 func (r authenticationRepository) AttemptRegister(
 	ctx context.Context,
 	credentials entities.UserCredentials,
 ) (int64, error) {
-	const query = `INSERT INTO users (name, email, password) VALUES (?, ?, ?, ?)`
+	const query = `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`
 
 	result, err := r.conn.ExecContext(
 		ctx,
@@ -90,13 +73,73 @@ func (r authenticationRepository) AttemptRegister(
 		credentials.Password,
 	)
 	if err != nil {
-		return -1, derr.NewInternalError("failed to execute query")
+		return -1, derr.JoinInternalError(err, "failed to execute query")
 	}
 
 	userID, err := result.LastInsertId()
 	if err != nil {
-		return -1, derr.NewInternalError("failed to get last inserted ID")
+		return -1, derr.JoinInternalError(err, "failed to get last inserted ID")
 	}
 
 	return userID, nil
+}
+
+func (r authenticationRepository) CheckUserCredentials(
+	ctx context.Context,
+	credentials entities.UserCredentials,
+) (bool, error) {
+	query := `
+	SELECT password 
+	FROM users
+	WHERE email = ?
+	`
+
+	var password string
+	err := r.conn.QueryRowContext(ctx, query, credentials.Email).Scan(&password)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, derr.NotFoundError
+		}
+
+		return false, derr.JoinInternalError(err, "failed to query or scan")
+	}
+
+	valid := util.CheckValidPassword(credentials.Password, password)
+	return valid, nil
+}
+
+func (r authenticationRepository) GetUserByID(
+	ctx context.Context,
+	userID int64,
+) (*entities.User, error) {
+	const query = `
+	SELECT 
+    	id, 
+    	name, 
+    	email,  
+    	carbo_coins, 
+    	carbon, 
+    	traveled_distance 
+	FROM users WHERE id = ?
+	`
+
+	var user entities.User
+	row := r.conn.QueryRowContext(ctx, query, userID)
+	err := row.Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.CarboCoins,
+		&user.Carbon,
+		&user.TraveledDistance,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, derr.NotFoundError
+		}
+
+		return nil, derr.JoinInternalError(err, "failed to scan")
+	}
+
+	return &user, nil
 }

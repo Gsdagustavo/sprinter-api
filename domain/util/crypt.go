@@ -2,23 +2,23 @@ package util
 
 import (
 	"encoding/json"
-	"errors"
 	"math/rand"
 	"time"
 
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/google/uuid"
 	"github.com/o1egl/paseto"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// HashCost defines the cost of the scrypt hash.
-const HashCost = 14
+// HashCost defines the cost of the bcrypt hash.
+const HashCost = 12
 
-// Hash generates a hashed string using the scrypt key derivation function.
+// Hash generates a hashed string using the bcrypt key derivation function.
 func Hash(informationToHash string) (string, error) {
 	generated, err := bcrypt.GenerateFromPassword([]byte(informationToHash), HashCost)
 	if err != nil {
-		return "", errors.Join(errors.New("failed to hash password"), err)
+		return "", derr.JoinInternalError(err, "failed to hash password")
 	}
 
 	return string(generated), nil
@@ -33,7 +33,7 @@ func GetUserIDFromToken(token string, pasetoSecurityKey string) (int, bool, erro
 	var footer string
 	_, err := paseto.Parse(token, &payload, &footer, symmetricKey, nil)
 	if err != nil {
-		return 0, false, errors.Join(errors.New("failed to parse token"), err)
+		return 0, false, derr.JoinInternalError(err, "failed to parse token")
 	}
 
 	if now.After(payload.Expiration) {
@@ -43,7 +43,7 @@ func GetUserIDFromToken(token string, pasetoSecurityKey string) (int, bool, erro
 	var userID int
 	err = json.Unmarshal([]byte(payload.Subject), &userID)
 	if err != nil {
-		return 0, false, errors.Join(errors.New("failed to parse unmarshal token payload"), err)
+		return 0, false, derr.JoinInternalError(err, "failed to parse unmarshal token payload")
 	}
 
 	return userID, false, nil
@@ -58,12 +58,12 @@ func GetNewAuthToken(userID int64, pasetoSecurityKey string) (string, error) {
 
 	tokenUUID, err := uuid.NewRandom()
 	if err != nil {
-		return "", errors.Join(errors.New("failed to generate new UUID"), err)
+		return "", derr.JoinInternalError(err, "failed to generate new UUID")
 	}
 
 	subjectJS, err := json.Marshal(userID)
 	if err != nil {
-		return "", errors.Join(errors.New("failed to marshal"), err)
+		return "", derr.JoinInternalError(err, "failed to marshal")
 	}
 
 	// Filling a new token with relevant data
@@ -84,7 +84,7 @@ func GetNewAuthToken(userID int64, pasetoSecurityKey string) (string, error) {
 
 	encrypted, err := v2.Encrypt(symmetricKey, jsonToken, footer)
 	if err != nil {
-		return "", errors.Join(errors.New("failed to encrypt json token"), err)
+		return "", derr.JoinInternalError(err, "failed to encrypt json token")
 	}
 
 	return encrypted, nil
@@ -103,7 +103,7 @@ func GenerateRandomPassword() string {
 }
 
 // CheckValidPassword verifies if the provided input password (after hashing it) matches the provided hashed password
-func CheckValidPassword(input, encryptedPassword string) (bool, error) {
+func CheckValidPassword(input, encryptedPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(encryptedPassword), []byte(input))
-	return err == nil, nil
+	return err == nil
 }

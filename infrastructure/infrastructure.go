@@ -6,12 +6,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/usecases"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/datastore/repositories"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/filestore/hdstore"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/router"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/router/modules"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/usecases"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore/hdstore"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/router"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/modules"
 	"github.com/gorilla/mux"
 )
 

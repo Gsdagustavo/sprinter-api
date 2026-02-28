@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/filestore"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore"
 )
 
 type hdFileStorage struct {

@@ -50,6 +50,13 @@ func NewBadRequestError(message string) ClientError {
 	}
 }
 
+func NewUnauthorizedError(message string) ClientError {
+	return ClientError{
+		Code:    "UNAUTHORIZED",
+		Message: message,
+	}
+}
+
 func JoinInternalError(err error, message string) error {
 	return NewInternalError(errors.Join(errors.New(message), err).Error())
 }

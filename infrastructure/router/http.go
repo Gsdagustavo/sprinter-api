@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities/derr"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/logger"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
+	"github.com/Gsdagustavo/sprinter-api/domain/logger"
 )
 
 type SuccessfulResponse struct {

@@ -2,7 +2,7 @@ POST http://localhost:8080/api/auth/login
 
 {
     "email": "gustavo@gmail.com",
-    "password": "Rg54757185"
+    "password": "Rg54757185#"
 }
 
 ###

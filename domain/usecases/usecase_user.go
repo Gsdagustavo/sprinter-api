@@ -1,13 +1,12 @@
 package usecases
 
 import (
-	"context"
 	"fmt"
 	"path"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities/derr"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/filestore"
+	"github.com/Gsdagustavo/sprinter-api/domain"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore"
 )
 
 func NewUserUseCases(

@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/VitorFranciscoDev/sprinter-api/domain"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/entities/derr"
-	"github.com/VitorFranciscoDev/sprinter-api/domain/logger"
-	"github.com/VitorFranciscoDev/sprinter-api/infrastructure/router"
+	"github.com/Gsdagustavo/sprinter-api/domain"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
+	"github.com/Gsdagustavo/sprinter-api/domain/logger"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/router"
 	"github.com/gorilla/mux"
 )
 
@@ -103,7 +103,7 @@ func (a authModule) sessionMiddleware(next http.Handler) http.Handler {
 			}
 
 			if user == nil {
-				slog.ErrorContext(ctx, "user not found")
+				slog.ErrorContext(ctx, "user not found in context")
 				_ = router.Write(w, unauthorizedBytes)
 				return
 			}
@@ -121,14 +121,14 @@ func (a authModule) sessionMiddleware(next http.Handler) http.Handler {
 				return
 			}
 
-			user, err = a.authUseCases.Get(ctx, token)
+			user, err = a.authUseCases.GetUserByToken(ctx, token)
 			if err != nil {
 				slog.ErrorContext(ctx, "failed to get user from token", logger.Err(err))
 				return
 			}
 
 			if user == nil {
-				slog.ErrorContext(ctx, "user not found")
+				slog.ErrorContext(ctx, "user not found in context")
 				_ = router.Write(w, unauthorizedBytes)
 				return
 			}
