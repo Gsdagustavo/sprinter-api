@@ -2,6 +2,7 @@ package entities
 
 import "time"
 
+// Product represents a product entity with details such as ID, name, price, and more.
 type Product struct {
 	// ID is the unique identifier of the product
 	ID int64 `json:"id,omitempty"`
@@ -11,6 +12,12 @@ type Product struct {
 
 	// Name is the name of the product like "Ticket Superbowl"
 	Name string `json:"name,omitempty"`
+
+	// Description provides additional details or an overview about the product.
+	Description string `json:"description,omitempty"`
+
+	// Image is the URL or location of the product's image.
+	Image string `json:"image,omitempty"`
 
 	// Price is the price of the product in CarboCoins
 	Price int64 `json:"price,omitempty"`
@@ -28,6 +35,7 @@ type Product struct {
 	ModifiedAt time.Time `json:"modified_at,omitempty"`
 }
 
+// ProductCart represents an item in the shopping cart with its details and metadata.
 type ProductCart struct {
 	// ID is the unique identifier of the product in cart
 	ID int64 `json:"id,omitempty"`

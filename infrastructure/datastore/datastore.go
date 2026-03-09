@@ -50,7 +50,7 @@ type AuthRepository interface {
 // ProductRepository defines methods for managing product data.
 type ProductRepository interface {
 	// AddNewProduct is trying to add a new product
-	AddNewProduct(ctx context.Context, product *entities.Product) error
+	AddNewProduct(ctx context.Context, product *entities.Product) (int64, error)
 
 	// DeleteProduct is trying to delete a product
 	DeleteProduct(ctx context.Context, id int64) error
