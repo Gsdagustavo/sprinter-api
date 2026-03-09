@@ -2,6 +2,5 @@
 <project version="4">
   <component name="DataSourcePerFileMappings">
     <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/mysql_auth.go" value="9d1c7762-d0fe-4a5e-ba05-77c8a43f52b2" />
-    <file url="file://$PROJECT_DIR$/scripts/sql/create.sql" value="9d1c7762-d0fe-4a5e-ba05-77c8a43f52b2" />
   </component>
 </project>

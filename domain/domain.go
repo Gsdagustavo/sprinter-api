@@ -48,3 +48,18 @@ type UserUseCase interface {
 		image []byte,
 	) (string, error)
 }
+
+// ProductUseCase defines a use case interface with methods related to product managing
+type ProductUseCase interface {
+	// AddNewProduct adds a new product to the database
+	AddNewProduct(ctx context.Context, product *entities.Product) error
+
+	// DeleteProduct deletes a product from the database
+	DeleteProduct(ctx context.Context, id int64) error
+
+	// UpdateProduct updates a product in the database
+	UpdateProduct(ctx context.Context, product *entities.Product) error
+
+	// GetAllAvailableProducts returns all available products from the database
+	GetAllAvailableProducts(ctx context.Context) ([]*entities.Product, error)
+}
