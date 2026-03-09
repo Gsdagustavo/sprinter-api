@@ -1,27 +1,30 @@
 package rules
 
-import "github.com/Gsdagustavo/sprinter-api/domain/entities"
+import (
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
+)
 
-func ValidateProduct(product *entities.Product) bool {
+func ValidateProduct(product *entities.Product) error {
 	if len(product.Name) < 3 {
-		return false
+		return derr.InvalidProductName
 	}
 
 	if len(product.Description) < 10 {
-		return false
+		return derr.InvalidProductDescription
 	}
 
 	if product.Price < 0 {
-		return false
+		return derr.InvalidProductPrice
 	}
 
 	if product.Stock < 0 {
-		return false
+		return derr.InvalidProductStock
 	}
 
 	if product.Discount < 0 || product.Discount > 100 {
-		return false
+		return derr.InvalidProductDiscount
 	}
 
-	return true
+	return nil
 }

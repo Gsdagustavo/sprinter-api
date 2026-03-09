@@ -1,6 +1,8 @@
 package modules
 
 import (
+	"net/http"
+
 	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router"
 	"github.com/gorilla/mux"

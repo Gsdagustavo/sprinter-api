@@ -60,9 +60,9 @@ type ProductUseCase interface {
 	// UpdateProduct updates a product in the database
 	UpdateProduct(ctx context.Context, product *entities.Product) error
 
-	// GetSingleProduct retrieves a single product by its ID from the database. Returns the product or an error if not found.
-	GetSingleProduct(ctx context.Context, id int64) (*entities.Product, error)
+	// GetProductByID retrieves a single product by its ID from the database. Returns the product or an error if not found.
+	GetProductByID(ctx context.Context, id int64) (*entities.Product, error)
 
-	// GetAllAvailableProducts returns all available products from the database
-	GetAllAvailableProducts(ctx context.Context) ([]*entities.Product, error)
+	// GetAllProducts returns all available products from the database
+	GetAllProducts(ctx context.Context) ([]entities.Product, error)
 }

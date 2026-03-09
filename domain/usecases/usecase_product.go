@@ -18,25 +18,32 @@ func NewProductUseCases(r datastore.ProductRepository) domain.ProductUseCase {
 }
 
 func (p productUseCases) AddNewProduct(ctx context.Context, product *entities.Product) (int64, error) {
-	rules.ValidateProduct(product)
+	err := rules.ValidateProduct(product)
+	if err != nil {
+		return 0, err
+	}
 
 	return p.repository.AddNewProduct(ctx, product)
 }
 
 func (p productUseCases) DeleteProduct(ctx context.Context, id int64) error {
+
 	return p.repository.DeleteProduct(ctx, id)
 }
 
 func (p productUseCases) UpdateProduct(ctx context.Context, product *entities.Product) error {
-	rules.ValidateProduct(product)
+	err := rules.ValidateProduct(product)
+	if err != nil {
+		return err
+	}
 
 	return p.repository.UpdateProduct(ctx, product)
 }
 
-func (p productUseCases) GetSingleProduct(ctx context.Context, id int64) (*entities.Product, error) {
-	return p.repository.GetSingleProduct(ctx, id)
+func (p productUseCases) GetProductByID(ctx context.Context, id int64) (*entities.Product, error) {
+	return p.repository.GetProductByID(ctx, id)
 }
 
-func (p productUseCases) GetAllAvailableProducts(ctx context.Context) ([]*entities.Product, error) {
-	return p.repository.GetAllAvailableProducts(ctx)
+func (p productUseCases) GetAllProducts(ctx context.Context) ([]entities.Product, error) {
+	return p.repository.GetAllProducts(ctx)
 }

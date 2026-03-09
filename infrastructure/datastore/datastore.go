@@ -58,11 +58,11 @@ type ProductRepository interface {
 	// UpdateProduct is trying to update a product
 	UpdateProduct(ctx context.Context, product *entities.Product) error
 
-	// GetSingleProduct is trying to get one single product
-	GetSingleProduct(ctx context.Context, id int64) (*entities.Product, error)
+	// GetProductByID is trying to get one single product
+	GetProductByID(ctx context.Context, id int64) (*entities.Product, error)
 
-	// GetAllAvailableProducts is trying to get all products
-	GetAllAvailableProducts(ctx context.Context) ([]*entities.Product, error)
+	// GetAllProducts is trying to get all products
+	GetAllProducts(ctx context.Context) ([]entities.Product, error)
 }
 
 // ActivityRepository defines methods for managing activity data.
