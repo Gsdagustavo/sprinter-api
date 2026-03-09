@@ -15,7 +15,7 @@ func ValidateProduct(product *entities.Product) bool {
 		return false
 	}
 
-	if product.Quantity < 0 {
+	if product.Stock < 0 {
 		return false
 	}
 

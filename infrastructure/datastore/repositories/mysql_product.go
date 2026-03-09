@@ -31,9 +31,9 @@ func (r productRepository) AddNewProduct(ctx context.Context, product *entities.
 		query,
 		&product.Name,
 		&product.Description,
-		&product.Image,
+		&product.ImageURL,
 		&product.Price,
-		&product.Quantity,
+		&product.Stock,
 		&product.Discount,
 	)
 	if err != nil {
@@ -75,12 +75,12 @@ func (r productRepository) UpdateProduct(ctx context.Context, product *entities.
 		UPDATE products SET name = ?, description = ?, image = ?, price = ?, quantity = ?, discount = ? WHERE id = ?
 	`
 
-	res, err := r.conn.ExecContext(ctx, query, &product.Name, &product.Description, &product.Image, &product.Price, &product.Quantity, &product.Discount, product.ID)
+	result, err := r.conn.ExecContext(ctx, query, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Stock, &product.Discount, product.ID)
 	if err != nil {
 		return derr.JoinInternalError(err, "failed to execute query")
 	}
 
-	rowsAffected, err := res.RowsAffected()
+	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return derr.JoinInternalError(err, "failed to get rows affected")
 	}
@@ -98,7 +98,7 @@ func (r productRepository) GetSingleProduct(ctx context.Context, id int64) (*ent
 	`
 
 	var product entities.Product
-	err := r.conn.QueryRowContext(ctx, query, id).Scan(&product.ID, &product.Name, &product.Description, &product.Image, &product.Price, &product.Quantity, &product.Discount)
+	err := r.conn.QueryRowContext(ctx, query, id).Scan(&product.ID, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Stock, &product.Discount)
 	if err != nil {
 		return nil, derr.JoinInternalError(err, "failed to execute query")
 	}

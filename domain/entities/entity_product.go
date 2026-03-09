@@ -16,14 +16,14 @@ type Product struct {
 	// Description provides additional details or an overview about the product.
 	Description string `json:"description,omitempty"`
 
-	// Image is the URL or location of the product's image.
-	Image string `json:"image,omitempty"`
+	// ImageURL is the URL or location of the product's image.
+	ImageURL string `json:"image_url,omitempty"`
 
 	// Price is the price of the product in CarboCoins
 	Price int64 `json:"price,omitempty"`
 
-	// Quantity is the stock of the product
-	Quantity int64 `json:"quantity,omitempty"`
+	// Stock is the stock of the product
+	Stock int64 `json:"stock,omitempty"`
 
 	// Discount is the percentage of discount that the product is on
 	Discount int64 `json:"discount,omitempty"`
