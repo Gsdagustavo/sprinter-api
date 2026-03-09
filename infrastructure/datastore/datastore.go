@@ -67,12 +67,10 @@ type ProductRepository interface {
 
 // ActivityRepository defines methods for managing activity data.
 type ActivityRepository interface {
-	// Save is trying to save the activity
-	Save(ctx context.Context, activity *entities.Activity) error
 
-	// Get is trying to get an activity information
-	Get(ctx context.Context, id int64) (*entities.Activity, error)
+	// StartActivity creates a new activity with the given type and returns its unique identifier or an error if it fails.
+	StartActivity(ctx context.Context, activityType entities.ActivityType) (int64, error)
 
-	// GetAll is trying to get all activities
-	GetAll(ctx context.Context) ([]*entities.Activity, error)
+	// EndActivity terminates an active activity by its unique identifier and updates its status in the repository.
+	EndActivity(ctx context.Context, activityID int64) error
 }

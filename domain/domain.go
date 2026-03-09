@@ -48,3 +48,8 @@ type UserUseCase interface {
 		image []byte,
 	) (string, error)
 }
+
+type ActivityUseCase interface {
+	StartActivity(ctx context.Context, activityType entities.ActivityType) (int64, error)
+	EndActivity(ctx context.Context, activityID int64) error
+}
