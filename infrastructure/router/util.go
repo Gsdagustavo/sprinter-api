@@ -26,5 +26,10 @@ func GetUser(r *http.Request) (*entities.User, error) {
 		return nil, ErrUserNotFoundInRequest
 	}
 
-	return contextUser.(*entities.User), nil
+	user, ok := contextUser.(*entities.User)
+	if user == nil || !ok {
+		return nil, ErrUserNotFoundInRequest
+	}
+
+	return user, nil
 }
