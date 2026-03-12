@@ -13,7 +13,6 @@ import (
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/logger"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure"
-	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -25,15 +24,6 @@ func main() {
 	if err != nil {
 		slog.Error("failed to initialize logger", logger.Err(err))
 	}
-
-	query := `
-	SELECT id,
-		   name,
-		   description
-	FROM products
-	`
-	count := datastore.GetQueryCount(query)
-	log.Printf("count: \n%s", count)
 
 	err = start()
 	if err != nil {
