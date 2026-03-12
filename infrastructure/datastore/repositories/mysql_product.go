@@ -41,7 +41,6 @@ func (r productRepository) AddNewProduct(ctx context.Context, product *entities.
 		&product.ImageURL,
 		&product.Price,
 		&product.Stock,
-		&product.Discount,
 	)
 	if err != nil {
 		return -1, derr.JoinInternalError(err, "failed to execute query")
@@ -87,7 +86,7 @@ func (r productRepository) UpdateProduct(ctx context.Context, product *entities.
 	WHERE id = ?
 	`
 
-	result, err := r.conn.ExecContext(ctx, query, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Stock, &product.Discount, product.ID)
+	result, err := r.conn.ExecContext(ctx, query, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Stock, product.ID)
 	if err != nil {
 		return derr.JoinInternalError(err, "failed to execute query")
 	}
@@ -125,7 +124,6 @@ func (r productRepository) GetProductByID(ctx context.Context, id int64) (*entit
 		&product.ImageURL,
 		&product.Price,
 		&product.Stock,
-		&product.Discount,
 	)
 	if err != nil {
 		return nil, derr.JoinInternalError(err, "failed to query or scan")
@@ -163,7 +161,6 @@ func (r productRepository) GetAllProducts(ctx context.Context) ([]entities.Produ
 			&product.ImageURL,
 			&product.Price,
 			&product.Stock,
-			&product.Discount,
 		)
 		if err != nil {
 			return nil, derr.JoinInternalError(err, "failed to scan")

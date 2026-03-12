@@ -21,10 +21,7 @@ type AuthenticationUseCase interface {
 	) (*entities.AuthenticationResponse, error)
 
 	// GetUserByEmail returns the user with the given email
-	GetUserByEmail(
-		ctx context.Context,
-		email string,
-	) (*entities.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*entities.User, error)
 
 	// CheckCredentials validates the user credentials
 	CheckCredentials(
@@ -52,7 +49,10 @@ type UserUseCase interface {
 // ProductUseCase defines a use case interface with methods related to product managing
 type ProductUseCase interface {
 	// AddNewProduct adds a new product to the database
-	AddNewProduct(ctx context.Context, product *entities.Product) (int64, error)
+	AddNewProduct(
+		ctx context.Context,
+		product *entities.Product,
+	) (int64, error)
 
 	// DeleteProduct deletes a product from the database
 	DeleteProduct(ctx context.Context, id int64) error

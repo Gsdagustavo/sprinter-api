@@ -22,9 +22,5 @@ func ValidateProduct(product *entities.Product) error {
 		return derr.InvalidProductStock
 	}
 
-	if product.Discount < 0 || product.Discount > 100 {
-		return derr.InvalidProductDiscount
-	}
-
 	return nil
 }
