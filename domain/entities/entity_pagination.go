@@ -14,3 +14,21 @@ type PaginatedList[T any] struct {
 	// Pages is the total number of pages considering the limit given by the client.
 	Pages int64 `json:"pages"`
 }
+
+// GeneralFilter is a generic struct that defines basic fields for pagination, sorting and filtering.
+type GeneralFilter struct {
+	// Limit is the maximum number of items that should be returned on a single page.
+	Limit int64 `json:"limit"`
+
+	// Page is the current page that should be returned.
+	Page int64 `json:"page"`
+
+	// OrderBy is the column that is being ordered in the request.
+	OrderBy string `json:"order_by"`
+
+	// Ordering is the type of ordination. Could be either ASC or DESC.
+	Ordering string `json:"ordering"`
+
+	// Search is the search used to filter items.
+	Search string `json:"search"`
+}

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/domain/rules"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
 )
@@ -44,6 +45,14 @@ func (p productUseCases) GetProductByID(ctx context.Context, id int64) (*entitie
 	return p.repository.GetProductByID(ctx, id)
 }
 
-func (p productUseCases) GetAllProducts(ctx context.Context) ([]entities.Product, error) {
-	return p.repository.GetAllProducts(ctx)
+func (p productUseCases) GetProducts(
+	ctx context.Context,
+	filter entities.GeneralFilter,
+) (*entities.PaginatedList[entities.Product], error) {
+	products, err := p.repository.GetProducts(ctx, filter)
+	if err != nil {
+		return nil, derr.JoinInternalError(err, "failed to get products")
+	}
+
+	return products, nil
 }

@@ -132,8 +132,11 @@ func (r productRepository) GetProductByID(ctx context.Context, id int64) (*entit
 	return &product, nil
 }
 
-func (r productRepository) GetAllProducts(ctx context.Context) ([]entities.Product, error) {
-	const query = `
+func (r productRepository) GetProducts(
+	ctx context.Context,
+	filter entities.GeneralFilter,
+) (*entities.PaginatedList[entities.Product], error) {
+	query := `
 	SELECT 
 		id, 
 		name, 
@@ -145,6 +148,8 @@ func (r productRepository) GetAllProducts(ctx context.Context) ([]entities.Produ
 	FROM products 
 	WHERE status_code = 0
 	`
+	query = datastore.GetPaginated(query, filter)
+
 	rows, err := r.conn.QueryContext(ctx, query)
 	if err != nil {
 		return nil, derr.JoinInternalError(err, "failed to query")
@@ -169,5 +174,20 @@ func (r productRepository) GetAllProducts(ctx context.Context) ([]entities.Produ
 		products = append(products, product)
 	}
 
-	return products, nil
+	countQuery := datastore.GetQueryCount(query)
+
+	var totalCount int64
+	err = r.conn.QueryRowContext(ctx, countQuery).Scan(&totalCount)
+	if err != nil {
+		return nil, derr.JoinInternalError(err, "failed to query or scan count")
+	}
+
+	pages := datastore.GetTotalPages(totalCount, filter)
+
+	return &entities.PaginatedList[entities.Product]{
+		Items:          products,
+		RequestedItems: filter.Limit,
+		TotalCount:     totalCount,
+		Pages:          pages,
+	}, nil
 }

@@ -61,8 +61,11 @@ type ProductRepository interface {
 	// GetProductByID is trying to get one single product
 	GetProductByID(ctx context.Context, id int64) (*entities.Product, error)
 
-	// GetAllProducts is trying to get all products
-	GetAllProducts(ctx context.Context) ([]entities.Product, error)
+	// GetProducts returns a paginated list of products that match the given filter.
+	GetProducts(
+		ctx context.Context,
+		filter entities.GeneralFilter,
+	) (*entities.PaginatedList[entities.Product], error)
 }
 
 // ActivityRepository defines methods for managing activity data.
