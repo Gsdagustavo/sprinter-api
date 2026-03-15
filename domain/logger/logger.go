@@ -24,8 +24,15 @@ func InitLogger() error {
 }
 
 func Err(err error) slog.Attr {
+	if err == nil {
+		return slog.Attr{
+			Key:   "cause",
+			Value: slog.AnyValue(err),
+		}
+	}
+
 	return slog.Attr{
 		Key:   "cause",
-		Value: slog.AnyValue(err),
+		Value: slog.StringValue(err.Error()),
 	}
 }

@@ -50,6 +50,7 @@ func GetDefaultFilterFromParams(r *http.Request) (*entities.GeneralFilter, error
 	var filter entities.GeneralFilter
 	query := r.URL.Query()
 
+	// Get "limit" parameter for pagination
 	limitStr := query.Get("limit")
 	if limitStr != "" {
 		limit, err := strconv.ParseInt(limitStr, 0, 64)
@@ -57,13 +58,10 @@ func GetDefaultFilterFromParams(r *http.Request) (*entities.GeneralFilter, error
 			return nil, derr.NewBadRequestError("failed to get limit parameter")
 		}
 
-		if limit < 0 {
-			limit = defaultLimit
-		}
-
 		filter.Limit = limit
 	}
 
+	// Get "page" parameter for pagination
 	pageStr := query.Get("page")
 	if pageStr != "" {
 		page, err := strconv.ParseInt(pageStr, 0, 64)
@@ -71,14 +69,27 @@ func GetDefaultFilterFromParams(r *http.Request) (*entities.GeneralFilter, error
 			return nil, derr.NewBadRequestError("failed to get page parameter")
 		}
 
-		if page < 0 {
-			page = defaultPage
-		}
-
 		filter.Page = page
 	}
 
+	// Ensure that both limit and page parameters are valid
+	if filter.Limit <= 0 {
+		filter.Limit = defaultLimit
+	}
+
+	if filter.Page <= 0 {
+		filter.Page = defaultPage
+	}
+
+	// Get search and ordering parameters
 	filter.Search = strings.TrimSpace(query.Get("search"))
+	filter.OrderBy = strings.TrimSpace(query.Get("orderBy"))
+	ordination := strings.TrimSpace(strings.ToUpper(query.Get("ordination")))
+	if ordination == "ASC" || ordination == "DESC" {
+		filter.Ordination = ordination
+	} else {
+		filter.Ordination = "ASC"
+	}
 
 	return &filter, nil
 }

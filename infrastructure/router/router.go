@@ -6,9 +6,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// RouteApiMethod is the API method used by a RouteDefinition
-type RouteApiMethod int
-
 type Module interface {
 	// Name returns the module name
 	Name() string
@@ -34,12 +31,4 @@ type RouteDefinition struct {
 
 	// HttpMethods is a list of HTTP methods accepted by the route
 	HttpMethods []string
-
-	// ApiMethods are the API methods allowed by the route
-	//
-	// Example:
-	//   - /activity/list: only allows SELECT method
-	//   - /activity/type/register: only allows INSERT method
-	//   - /activity/type/update: only allows UPDATE method
-	ApiMethods []RouteApiMethod
 }

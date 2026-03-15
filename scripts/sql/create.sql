@@ -28,8 +28,11 @@ CREATE TABLE products
     id          INT PRIMARY KEY AUTO_INCREMENT,
     name        VARCHAR(50)  NOT NULL,
     description VARCHAR(255) NOT NULL DEFAULT '',
+    price       INT          NOT NULL,
+    stock       INT          NOT NULL DEFAULT 0,
+    image_url   VARCHAR(255) NOT NULL DEFAULT '',
     status_code INT          NOT NULL DEFAULT 0,
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_product_status_code (status_code)
-)
+);

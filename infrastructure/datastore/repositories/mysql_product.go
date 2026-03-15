@@ -26,11 +26,11 @@ func (r productRepository) AddNewProduct(ctx context.Context, product *entities.
 	INSERT INTO products (
 					  name,
                       description,
-                      image,
                       price,
-                      quantity,
-                      discount)
-	VALUES (?, ?, ?, ?, ?, ?)
+                      stock,
+					  image_url
+                      )
+	VALUES (?, ?, ?, ?, ?)
 	`
 
 	res, err := r.conn.ExecContext(
@@ -38,9 +38,9 @@ func (r productRepository) AddNewProduct(ctx context.Context, product *entities.
 		query,
 		&product.Name,
 		&product.Description,
-		&product.ImageURL,
 		&product.Price,
 		&product.Stock,
+		&product.ImageURL,
 	)
 	if err != nil {
 		return -1, derr.JoinInternalError(err, "failed to execute query")
@@ -76,13 +76,12 @@ func (r productRepository) DeleteProduct(ctx context.Context, id int64) error {
 
 func (r productRepository) UpdateProduct(ctx context.Context, product *entities.Product) error {
 	const query = `
-	UPDATE products 
-	SET name = ?, 
-		description = ?, 
-		image = ?, 
-		price = ?, 
-		quantity = ?, 
-		discount = ? 
+	UPDATE products
+	SET name = ?,
+		description = ?,
+		price = ?,
+		stock = ?,
+		image_url = ?
 	WHERE id = ?
 	`
 
@@ -105,14 +104,13 @@ func (r productRepository) UpdateProduct(ctx context.Context, product *entities.
 
 func (r productRepository) GetProductByID(ctx context.Context, id int64) (*entities.Product, error) {
 	const query = `
-	SELECT id, 
-		   name, 
-		   description, 
-		   image, 
-		   price, 
-		   quantity, 
-		   discount 
-	FROM products 
+	SELECT id,
+		   name,
+		   description,
+		   price,
+		   stock,
+		   image_url
+	FROM products
 	WHERE id = ? AND status_code = 0
 	`
 
@@ -121,9 +119,9 @@ func (r productRepository) GetProductByID(ctx context.Context, id int64) (*entit
 		&product.ID,
 		&product.Name,
 		&product.Description,
-		&product.ImageURL,
 		&product.Price,
 		&product.Stock,
+		&product.ImageURL,
 	)
 	if err != nil {
 		return nil, derr.JoinInternalError(err, "failed to query or scan")
@@ -137,15 +135,14 @@ func (r productRepository) GetProducts(
 	filter entities.GeneralFilter,
 ) (*entities.PaginatedList[entities.Product], error) {
 	query := `
-	SELECT 
-		id, 
-		name, 
-		description, 
-		image, 
-		price, 
-		quantity, 
-		discount 
-	FROM products 
+	SELECT
+		id,
+		name,
+		description,
+		price,
+		stock,
+		image_url
+	FROM products
 	WHERE status_code = 0
 	`
 	query = datastore.GetPaginated(query, filter)
@@ -156,16 +153,16 @@ func (r productRepository) GetProducts(
 	}
 	defer rows.Close()
 
-	var products []entities.Product
+	products := make([]entities.Product, 0)
 	for rows.Next() {
 		var product entities.Product
 		err = rows.Scan(
 			&product.ID,
 			&product.Name,
 			&product.Description,
-			&product.ImageURL,
 			&product.Price,
 			&product.Stock,
+			&product.ImageURL,
 		)
 		if err != nil {
 			return nil, derr.JoinInternalError(err, "failed to scan")

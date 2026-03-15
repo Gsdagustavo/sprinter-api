@@ -26,8 +26,8 @@ type GeneralFilter struct {
 	// OrderBy is the column that is being ordered in the request.
 	OrderBy string `json:"order_by"`
 
-	// Ordering is the type of ordination. Could be either ASC or DESC.
-	Ordering string `json:"ordering"`
+	// Ordination is the type of ordination. Could be either ASC or DESC.
+	Ordination string `json:"ordination"`
 
 	// Search is the search used to filter items.
 	Search string `json:"search"`

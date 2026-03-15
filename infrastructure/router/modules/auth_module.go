@@ -29,38 +29,38 @@ func NewAuthModule(authUseCases domain.AuthenticationUseCase) router.Module {
 	}
 }
 
-func (a authModule) Name() string {
-	return a.name
+func (m authModule) Name() string {
+	return m.name
 }
 
-func (a authModule) Path() string {
-	return a.path
+func (m authModule) Path() string {
+	return m.path
 }
 
-func (a authModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router) {
+func (m authModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router) {
 	defs := []router.RouteDefinition{
 		{
 			Path:        "/login",
 			Description: "Attempt user login",
-			Handler:     a.login,
+			Handler:     m.login,
 			HttpMethods: []string{http.MethodPost},
 		},
 		{
 			Path:        "/register",
 			Description: "Attempt user register",
-			Handler:     a.register,
+			Handler:     m.register,
 			HttpMethods: []string{http.MethodPost},
 		},
 	}
 
 	for _, d := range defs {
-		r.HandleFunc(a.path+d.Path, d.Handler).Methods(d.HttpMethods...)
+		r.HandleFunc(m.path+d.Path, d.Handler).Methods(d.HttpMethods...)
 	}
 
 	return defs, r
 }
 
-func (a authModule) sessionMiddleware(next http.Handler) http.Handler {
+func (m authModule) sessionMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		authHeader := r.Header.Get("Authorization")
@@ -82,7 +82,7 @@ func (a authModule) sessionMiddleware(next http.Handler) http.Handler {
 				Password: password,
 			}
 
-			valid, err := a.authUseCases.CheckCredentials(ctx, credentials)
+			valid, err := m.authUseCases.CheckCredentials(ctx, credentials)
 			if err != nil {
 				slog.ErrorContext(ctx, "failed to check credentials", logger.Err(err))
 				_ = router.Write(w, unauthorizedBytes)
@@ -95,7 +95,7 @@ func (a authModule) sessionMiddleware(next http.Handler) http.Handler {
 				return
 			}
 
-			user, err = a.authUseCases.GetUserByEmail(ctx, credentials.Email)
+			user, err = m.authUseCases.GetUserByEmail(ctx, credentials.Email)
 			if err != nil {
 				slog.ErrorContext(ctx, "failed to get user by document", logger.Err(err))
 				_ = router.Write(w, unauthorizedBytes)
@@ -121,7 +121,7 @@ func (a authModule) sessionMiddleware(next http.Handler) http.Handler {
 				return
 			}
 
-			user, err = a.authUseCases.GetUserByToken(ctx, token)
+			user, err = m.authUseCases.GetUserByToken(ctx, token)
 			if err != nil {
 				slog.ErrorContext(ctx, "failed to get user from token", logger.Err(err))
 				return
@@ -138,7 +138,7 @@ func (a authModule) sessionMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (a authModule) login(w http.ResponseWriter, r *http.Request) {
+func (m authModule) login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	body, err := io.ReadAll(r.Body)
@@ -156,7 +156,7 @@ func (a authModule) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := a.authUseCases.AttemptLogin(ctx, credentials)
+	response, err := m.authUseCases.AttemptLogin(ctx, credentials)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt login", logger.Err(err))
 		router.HandleError(w, err)
@@ -170,7 +170,7 @@ func (a authModule) login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a authModule) register(w http.ResponseWriter, r *http.Request) {
+func (m authModule) register(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	body, err := io.ReadAll(r.Body)
@@ -188,7 +188,7 @@ func (a authModule) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := a.authUseCases.AttemptRegister(ctx, credentials)
+	response, err := m.authUseCases.AttemptRegister(ctx, credentials)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt register", logger.Err(err))
 		router.HandleError(w, err)
@@ -202,7 +202,7 @@ func (a authModule) register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a authModule) me(w http.ResponseWriter, r *http.Request) {
+func (m authModule) me(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	body, err := io.ReadAll(r.Body)
@@ -220,7 +220,7 @@ func (a authModule) me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := a.authUseCases.AttemptRegister(ctx, credentials)
+	response, err := m.authUseCases.AttemptRegister(ctx, credentials)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt register", logger.Err(err))
 		router.HandleError(w, err)

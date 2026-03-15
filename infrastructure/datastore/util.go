@@ -15,7 +15,7 @@ func GetQueryCount(query string) string {
 		idx = len(query)
 	}
 	base := "SELECT COUNT(*) FROM ("
-	return fmt.Sprintf(base+"%s\n)", query[:idx])
+	return fmt.Sprintf(base+"%s\n) as count", query[:idx])
 }
 
 // GetPaginated returns the given query with pagination based on the given filter
