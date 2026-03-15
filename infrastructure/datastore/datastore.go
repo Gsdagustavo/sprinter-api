@@ -49,20 +49,23 @@ type AuthRepository interface {
 
 // ProductRepository defines methods for managing product data.
 type ProductRepository interface {
-	// Add is trying to add a new product
-	Add(ctx context.Context, product *entities.Product) error
+	// AddNewProduct is trying to add a new product
+	AddNewProduct(ctx context.Context, product *entities.Product) (int64, error)
 
-	// Delete is trying to delete a product
-	Delete(ctx context.Context, id int64) error
+	// DeleteProduct is trying to delete a product
+	DeleteProduct(ctx context.Context, id int64) error
 
-	// Update is trying to update a product
-	Update(ctx context.Context, product *entities.Product) error
+	// UpdateProduct is trying to update a product
+	UpdateProduct(ctx context.Context, product *entities.Product) error
 
-	// Get is trying to get one single product
-	Get(ctx context.Context, id int64) (*entities.Product, error)
+	// GetProductByID is trying to get one single product
+	GetProductByID(ctx context.Context, id int64) (*entities.Product, error)
 
-	// GetAll is trying to get all products
-	GetAll(ctx context.Context) ([]*entities.Product, error)
+	// GetProducts returns a paginated list of products that match the given filter.
+	GetProducts(
+		ctx context.Context,
+		filter entities.GeneralFilter,
+	) (*entities.PaginatedList[entities.Product], error)
 }
 
 // ActivityRepository defines methods for managing activity data.
