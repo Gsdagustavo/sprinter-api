@@ -1,1 +1,0 @@
-docker run -d --name sprinter_db -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=sprinter_db -v mysql_data:/var/lib/mysql --restart unless-stopped mysql:8.0

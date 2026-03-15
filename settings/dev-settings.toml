@@ -4,7 +4,7 @@ Environment = "development"
 integrationToken = "123456"
 
 [Server]
-port = 8080
+port = 8000
 host = "localhost"
 
 [Database]
