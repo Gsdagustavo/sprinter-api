@@ -145,6 +145,17 @@ func (r productRepository) GetProducts(
 	FROM products
 	WHERE status_code = 0
 	`
+
+	ordination := filter.Ordination
+	switch filter.OrderBy {
+	case "name":
+		query += " ORDER BY name " + ordination
+	case "price":
+		query += " ORDER BY price " + ordination
+	case "stock":
+		query += " ORDER BY stock " + ordination
+	}
+
 	query = datastore.GetPaginated(query, filter)
 
 	rows, err := r.conn.QueryContext(ctx, query)

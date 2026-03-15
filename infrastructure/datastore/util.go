@@ -10,10 +10,19 @@ import (
 
 // GetQueryCount returns the count version of the given query
 func GetQueryCount(query string) string {
-	idx := strings.Index(query, "ORDER BY")
-	if idx < 0 {
-		idx = len(query)
+	var idx int
+	if strings.Contains(query, "ORDER BY") {
+		idx = strings.Index(query, "ORDER BY")
+		if idx < 0 {
+			idx = len(query)
+		}
+	} else {
+		idx = strings.Index(query, "LIMIT")
+		if idx < 0 {
+			idx = len(query)
+		}
 	}
+
 	base := "SELECT COUNT(*) FROM ("
 	return fmt.Sprintf(base+"%s\n) as count", query[:idx])
 }
