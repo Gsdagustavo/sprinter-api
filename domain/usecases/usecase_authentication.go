@@ -132,3 +132,7 @@ func (a authenticationUseCase) GetUserByToken(
 
 	return a.repository.GetUserByID(ctx, int64(id))
 }
+
+func (a authenticationUseCase) AttemptCompleteRegistration(ctx context.Context, information entities.AccountInformation) (int64, error) {
+	return a.repository.AttemptCompleteRegistration(ctx, information)
+}

@@ -51,6 +51,12 @@ func (m authModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router)
 			Handler:     m.register,
 			HttpMethods: []string{http.MethodPost},
 		},
+		{
+			Path:        "/completeRegistration",
+			Description: "Attempt complete user registration",
+			Handler:     m.completeRegistration,
+			HttpMethods: []string{http.MethodPost},
+		},
 	}
 
 	for _, d := range defs {
@@ -228,6 +234,37 @@ func (m authModule) me(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Authorization", "Bearer "+response.Token)
+	err = router.Write(w, response)
+	if err != nil {
+		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
+	}
+}
+
+func (m authModule) completeRegistration(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to read request body", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	var information entities.AccountInformation
+	err = json.Unmarshal(body, &information)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to unmarshal request body", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	response, err := m.authUseCases.AttemptCompleteRegistration(ctx, information)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to attempt register", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
 	err = router.Write(w, response)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))

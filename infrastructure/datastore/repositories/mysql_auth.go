@@ -143,3 +143,22 @@ func (r authenticationRepository) GetUserByID(
 
 	return &user, nil
 }
+
+func (r authenticationRepository) AttemptCompleteRegistration(ctx context.Context, information entities.AccountInformation) (int64, error) {
+	const query = `
+	UPDATE users SET (image_url, username, biography) VALUES (?, ?, ?) where id = ?
+	`
+
+	_, err := r.conn.ExecContext(
+		ctx,
+		query,
+		information.ImageURL,
+		information.Username,
+		information.Biography,
+	)
+	if err != nil {
+		return -1, derr.JoinInternalError(err, "failed to execute query")
+	}
+
+	return information.ID, nil
+}

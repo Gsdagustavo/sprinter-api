@@ -34,6 +34,9 @@ type AuthenticationUseCase interface {
 		ctx context.Context,
 		token string,
 	) (*entities.User, error)
+
+	// AttemptCompleteRegistration tries to complete the user registration
+	AttemptCompleteRegistration(ctx context.Context, information entities.AccountInformation) (int64, error)
 }
 
 // UserUseCase defines a use case interface with methods related to user managing
