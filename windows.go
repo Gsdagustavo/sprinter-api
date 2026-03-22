@@ -148,19 +148,19 @@ func configureOutput(logFolder string) (*os.File, error) {
 func readCFGFile(cfgPath string) (*entities.Settings, error) {
 	file, err := os.Open(cfgPath)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to "), err)
+		return nil, errors.Join(errors.New("failed to open file"), err)
 	}
 	defer file.Close()
 
 	bytes, err := io.ReadAll(file)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to "), err)
+		return nil, errors.Join(errors.New("failed to read file"), err)
 	}
 
 	var cfg entities.Settings
 	_, err = toml.Decode(string(bytes), &cfg)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to "), err)
+		return nil, errors.Join(errors.New("failed to decode file"), err)
 	}
 
 	return &cfg, nil
