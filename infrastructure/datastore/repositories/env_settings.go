@@ -16,7 +16,7 @@ type settingsRepository struct {
 	connection *sql.DB
 }
 
-func NewSettingsRepository(config entities.Config) (datastore.RepositorySettings, error) {
+func NewSettingsRepository(config entities.Settings) (datastore.RepositorySettings, error) {
 	db, err := setupConnection(config)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s settingsRepository) ServerTime(
 	return &serverTime, nil
 }
 
-func setupConnection(config entities.Config) (*sql.DB, error) {
+func setupConnection(config entities.Settings) (*sql.DB, error) {
 	//err := migrateDatabase(config)
 	//if err != nil {
 	//	return nil, err
@@ -62,11 +62,11 @@ func setupConnection(config entities.Config) (*sql.DB, error) {
 
 	connection := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?parseTime=true",
-		config.Database.User,
-		config.Database.Password,
-		config.Database.Host,
-		config.Database.Port,
-		config.Database.Name,
+		config.RepositorySettings.User,
+		config.RepositorySettings.Password,
+		config.RepositorySettings.Host,
+		config.RepositorySettings.Port,
+		config.RepositorySettings.Name,
 	)
 
 	db, err := sql.Open("mysql", connection)
@@ -81,14 +81,14 @@ func setupConnection(config entities.Config) (*sql.DB, error) {
 	return db, nil
 }
 
-//func migrateDatabase(config entities.Config) error {
+//func migrateDatabase(config entities.Settings) error {
 //	connection := fmt.Sprintf(
 //		"mysql://%s:%s@tcp(%s:%s)/%s?parseTime=true",
-//		config.Database.User,
-//		config.Database.Password,
-//		config.Database.Host,
-//		config.Database.Port,
-//		config.Database.Name,
+//		config.RepositorySettings.User,
+//		config.RepositorySettings.Password,
+//		config.RepositorySettings.Host,
+//		config.RepositorySettings.Port,
+//		config.RepositorySettings.Name,
 //	)
 //
 //	fsMigrations, err := iofs.New(fs, "migrations")
