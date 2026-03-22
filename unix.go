@@ -25,7 +25,7 @@ func start() error {
 
 	cfg, err := readCFGFile(configsPath)
 	if err != nil {
-		return errors.Join(err, "failed to read config file")
+		return errors.Join(errors.New("failed to read config file"), err)
 	}
 
 	file, err := configureOutput(cfg.LogSettings.LogDir)
@@ -111,7 +111,7 @@ func readCFGFile(cfgPath string) (*entities.Settings, error) {
 		return nil, errors.Join(errors.New("failed to decode file"), err)
 	}
 
-	return &cfg
+	return &cfg, nil
 }
 
 func newService(cfg entities.Settings) (service.Service, error) {
