@@ -23,9 +23,12 @@ func start() error {
 		return errors.New("CONFIGS_PATH environment variable not set")
 	}
 
-	cfg := readCFGFile(configsPath)
+	cfg, err := readCFGFile(configsPath)
+	if err != nil {
+		return errors.Join(err, "failed to read config file")
+	}
 
-	file, err := configureOutput(cfg.LogDir)
+	file, err := configureOutput(cfg.LogSettings.LogDir)
 	if err != nil {
 		return errors.Join(errors.New("failed to configure log outputs"), err)
 	}
