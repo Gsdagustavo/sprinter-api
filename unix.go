@@ -89,7 +89,7 @@ func configureOutput(logFolder string) (*os.File, error) {
 	return file, nil
 }
 
-func readCFGFile(cfgPath string) *entities.Config {
+func readCFGFile(cfgPath string) *entities.Settings {
 	file, err := os.Open(cfgPath)
 	if err != nil {
 		panic(err)
@@ -105,7 +105,7 @@ func readCFGFile(cfgPath string) *entities.Config {
 		panic(err)
 	}
 
-	var cfg entities.Config
+	var cfg entities.Settings
 
 	_, err = toml.Decode(string(b), &cfg)
 	if err != nil {
@@ -115,7 +115,7 @@ func readCFGFile(cfgPath string) *entities.Config {
 	return &cfg
 }
 
-func newService(cfg entities.Config) (service.Service, error) {
+func newService(cfg entities.Settings) (service.Service, error) {
 	slog.Info("creating service")
 
 	// Load the received arguments

@@ -20,10 +20,13 @@ import (
 
 func start() error {
 	configsPath, action, terminal := loadFlags()
-	cfg := readCFGFile(configsPath)
+	cfg, err := readCFGFile(configsPath)
+	if err != nil {
+		return errors.Join(errors.New("failed to read config file"), err)
+	}
 
 	if !terminal {
-		file, err := configureOutput(cfg.LogDir)
+		file, err := configureOutput(cfg.LogSettings.LogDir)
 		if err != nil {
 			return errors.Join(errors.New("failed to configure log outputs"), err)
 		}
@@ -142,33 +145,28 @@ func configureOutput(logFolder string) (*os.File, error) {
 	return file, nil
 }
 
-func readCFGFile(cfgPath string) *entities.Config {
+func readCFGFile(cfgPath string) (*entities.Settings, error) {
 	file, err := os.Open(cfgPath)
 	if err != nil {
-		panic(err)
+		return nil, errors.Join(errors.New("failed to "), err)
 	}
+	defer file.Close()
 
-	b, err := io.ReadAll(file)
+	bytes, err := io.ReadAll(file)
 	if err != nil {
-		panic(err)
+		return nil, errors.Join(errors.New("failed to "), err)
 	}
 
-	err = file.Close()
+	var cfg entities.Settings
+	_, err = toml.Decode(string(bytes), &cfg)
 	if err != nil {
-		panic(err)
+		return nil, errors.Join(errors.New("failed to "), err)
 	}
 
-	var cfg entities.Config
-
-	_, err = toml.Decode(string(b), &cfg)
-	if err != nil {
-		panic(err)
-	}
-
-	return &cfg
+	return &cfg, nil
 }
 
-func newService(cfg entities.Config) (service.Service, error) {
+func newService(cfg entities.Settings) (service.Service, error) {
 	slog.Info("creating service")
 
 	// Load the received arguments
@@ -195,7 +193,7 @@ func newService(cfg entities.Config) (service.Service, error) {
 
 	s, err := service.New(p, svcConfig)
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(errors.New("failed to create service"), err)
 	}
 
 	return s, nil

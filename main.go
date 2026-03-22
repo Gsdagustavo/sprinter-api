@@ -34,7 +34,7 @@ func main() {
 
 type program struct {
 	server *http.Server
-	cfg    entities.Config
+	cfg    entities.Settings
 }
 
 func (p *program) SetupServer(r *mux.Router) {
