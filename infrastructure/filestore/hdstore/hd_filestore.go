@@ -18,7 +18,7 @@ func NewHDFileStorage(
 	config entities.Settings,
 ) filestore.FileStorage {
 	fileStorage := hdFileStorage{
-		storageFolder: config.FileStorage.StorageFolder,
+		storageFolder: config.StorageSettings.StorageFolder,
 	}
 
 	err := fileStorage.Setup()

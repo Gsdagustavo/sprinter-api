@@ -5,23 +5,24 @@ import (
 	"path"
 
 	"github.com/Gsdagustavo/sprinter-api/domain"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore"
 )
 
 func NewUserUseCases(
 	storage filestore.FileStorage,
-	storageFolder string,
+	storageConfig entities.StorageSettings,
 ) domain.UserUseCase {
 	return userUseCase{
 		storage:       storage,
-		storageFolder: storageFolder,
+		storageConfig: storageConfig,
 	}
 }
 
 type userUseCase struct {
 	storage       filestore.FileStorage
-	storageFolder string
+	storageConfig entities.StorageSettings
 }
 
 func (u userUseCase) SaveUserProfilePicture(
@@ -47,7 +48,7 @@ func (u userUseCase) SaveUserProfilePicture(
 func (u userUseCase) getUserFolder(
 	userID int64,
 ) string {
-	storageFolder := u.storageFolder
+	storageFolder := u.storageConfig.StorageFolder
 	userFolder := path.Join(storageFolder, fmt.Sprintf("%d", userID))
 	return userFolder
 }

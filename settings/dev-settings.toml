@@ -18,7 +18,7 @@ LogDir = "./runtime/logs"
 [Paseto]
 PasetoSecurityKey = "b7e16bf2-ab0f-4a68-a16b-f2ab0f6a"
 
-[FileStorage]
+[StorageSettings]
 StorageFolder = "./runtime/storage"
 
 [SMTPConfig]

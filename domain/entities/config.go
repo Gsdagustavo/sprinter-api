@@ -17,8 +17,8 @@ type Settings struct {
 	// Paseto is the settings for data for encryption
 	Paseto Paseto `toml:"Paseto"`
 
-	// FileStorage is the settings related to file storage
-	FileStorage FileStorage `toml:"FileStorage"`
+	// StorageSettings is the settings related to file storage
+	StorageSettings StorageSettings `toml:"StorageSettings"`
 
 	// SMTPConfig is the for the SMTP server connection
 	SMTPConfig SMTPConfig `toml:"STMPConfig"`
@@ -76,8 +76,8 @@ type Paseto struct {
 	SecurityKey string `toml:"PasetoSecurityKey"`
 }
 
-// FileStorage represents the configuration for storing files.
-type FileStorage struct {
+// StorageSettings represents the configuration for storing files.
+type StorageSettings struct {
 	// StorageFolder is the folder for storing files
 	StorageFolder string `toml:"StorageFolder"`
 }

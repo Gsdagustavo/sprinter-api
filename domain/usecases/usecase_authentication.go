@@ -13,11 +13,11 @@ import (
 )
 
 func NewAuthenticationUseCase(
-	r datastore.AuthRepository,
+	repository datastore.AuthRepository,
 	securityKey string,
 ) domain.AuthenticationUseCase {
 	return authenticationUseCase{
-		repository:  r,
+		repository:  repository,
 		securityKey: securityKey,
 	}
 }
