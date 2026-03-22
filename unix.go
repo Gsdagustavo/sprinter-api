@@ -23,9 +23,12 @@ func start() error {
 		return errors.New("CONFIGS_PATH environment variable not set")
 	}
 
-	cfg := readCFGFile(configsPath)
+	cfg, err := readCFGFile(configsPath)
+	if err != nil {
+		return errors.Join(errors.New("failed to read config file"), err)
+	}
 
-	file, err := configureOutput(cfg.LogDir)
+	file, err := configureOutput(cfg.LogSettings.LogDir)
 	if err != nil {
 		return errors.Join(errors.New("failed to configure log outputs"), err)
 	}
@@ -89,33 +92,29 @@ func configureOutput(logFolder string) (*os.File, error) {
 	return file, nil
 }
 
-func readCFGFile(cfgPath string) *entities.Config {
+func readCFGFile(cfgPath string) (*entities.Settings, error) {
 	file, err := os.Open(cfgPath)
 	if err != nil {
-		panic(err)
+		return nil, errors.Join(errors.New("failed to open file"), err)
 	}
+	defer file.Close()
 
 	b, err := io.ReadAll(file)
 	if err != nil {
-		panic(err)
+		return nil, errors.Join(errors.New("failed to read file"), err)
 	}
 
-	err = file.Close()
-	if err != nil {
-		panic(err)
-	}
-
-	var cfg entities.Config
+	var cfg entities.Settings
 
 	_, err = toml.Decode(string(b), &cfg)
 	if err != nil {
-		panic(err)
+		return nil, errors.Join(errors.New("failed to decode file"), err)
 	}
 
-	return &cfg
+	return &cfg, nil
 }
 
-func newService(cfg entities.Config) (service.Service, error) {
+func newService(cfg entities.Settings) (service.Service, error) {
 	slog.Info("creating service")
 
 	// Load the received arguments

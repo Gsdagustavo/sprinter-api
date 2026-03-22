@@ -15,7 +15,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func SetupModules(r *mux.Router, config entities.Config) error {
+func SetupModules(r *mux.Router, config entities.Settings) error {
 	// Repository settings
 	settings, err := repositories.NewSettingsRepository(config)
 	if err != nil {

@@ -15,13 +15,12 @@ type hdFileStorage struct {
 }
 
 func NewHDFileStorage(
-	config entities.Config,
+	config entities.Settings,
 ) filestore.FileStorage {
 	fileStorage := hdFileStorage{
 		storageFolder: config.FileStorage.StorageFolder,
 	}
 
-	// Attempt to set up storage
 	err := fileStorage.Setup()
 	if err != nil {
 		panic(fmt.Errorf("failed to setup file storage: %v", err))
