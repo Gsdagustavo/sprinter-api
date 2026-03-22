@@ -92,23 +92,23 @@ func configureOutput(logFolder string) (*os.File, error) {
 	return file, nil
 }
 
-func readCFGFile(cfgPath string) *entities.Settings {
+func readCFGFile(cfgPath string) (*entities.Settings, error) {
 	file, err := os.Open(cfgPath)
 	if err != nil {
-		return errors.Join(errors.New("failed to open file"), err)
+		return nil, errors.Join(errors.New("failed to open file"), err)
 	}
 	defer file.Close()
 
 	b, err := io.ReadAll(file)
 	if err != nil {
-		return errors.Join(errors.New("failed to read file"), err)
+		return nil, errors.Join(errors.New("failed to read file"), err)
 	}
 
 	var cfg entities.Settings
 
 	_, err = toml.Decode(string(b), &cfg)
 	if err != nil {
-		return errors.Join(errors.New("failed to decode file"), err)
+		return nil, errors.Join(errors.New("failed to decode file"), err)
 	}
 
 	return &cfg
