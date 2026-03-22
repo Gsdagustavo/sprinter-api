@@ -47,7 +47,10 @@ type AuthRepository interface {
 	) (bool, error)
 
 	// AttemptCompleteRegistration tries to complete the user registration
-	AttemptCompleteRegistration(ctx context.Context, information entities.AccountInformation) (int64, error)
+	AttemptCompleteRegistration(
+		ctx context.Context,
+		information entities.AccountInformation,
+	) (int64, error)
 }
 
 // ProductRepository defines methods for managing product data.

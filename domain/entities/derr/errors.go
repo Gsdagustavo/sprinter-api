@@ -17,6 +17,11 @@ var (
 )
 
 var (
+	InvalidUsername  = NewClientError("INVALID_USERNAME", "Invalid username")
+	InvalidBiography = NewClientError("INVALID_BIOGRAPHY", "Invalid biography")
+)
+
+var (
 	InvalidProductName        = NewClientError("INVALID_PRODUCT_NAME", "Invalid product name")
 	InvalidProductDescription = NewClientError("INVALID_DESCRIPTION", "Invalid product description")
 	InvalidProductPrice       = NewClientError("INVALID_PRODUCT_PRICE", "Invalid product price")

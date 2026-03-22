@@ -3,6 +3,9 @@ package usecases
 import (
 	"context"
 	"errors"
+	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
@@ -10,21 +13,25 @@ import (
 	"github.com/Gsdagustavo/sprinter-api/domain/rules"
 	"github.com/Gsdagustavo/sprinter-api/domain/util"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore"
 )
 
 func NewAuthenticationUseCase(
 	repository datastore.AuthRepository,
 	securityKey string,
+	storage filestore.FileStorage,
 ) domain.AuthenticationUseCase {
 	return authenticationUseCase{
 		repository:  repository,
 		securityKey: securityKey,
+		storage:     storage,
 	}
 }
 
 type authenticationUseCase struct {
 	repository  datastore.AuthRepository
 	securityKey string
+	storage     filestore.FileStorage
 }
 
 func (a authenticationUseCase) AttemptLogin(
@@ -133,6 +140,44 @@ func (a authenticationUseCase) GetUserByToken(
 	return a.repository.GetUserByID(ctx, int64(id))
 }
 
-func (a authenticationUseCase) AttemptCompleteRegistration(ctx context.Context, information entities.AccountInformation) (int64, error) {
-	return a.repository.AttemptCompleteRegistration(ctx, information)
+func (a authenticationUseCase) AttemptCompleteRegistration(
+	ctx context.Context,
+	information *entities.AccountInformation,
+) (int64, error) {
+	information.Username = strings.TrimSpace(information.Username)
+	information.Biography = strings.TrimSpace(information.Biography)
+
+	if !rules.ValidateName(information.Username) {
+		return 0, derr.InvalidUsername
+	}
+
+	if !rules.ValidateBiography(information.Biography) {
+		return 0, derr.InvalidBiography
+	}
+
+	return a.repository.AttemptCompleteRegistration(ctx, *information)
+}
+
+func (a authenticationUseCase) RegisterProfileImage(
+	ctx context.Context,
+	userID int64,
+	image []byte,
+) error {
+	_, err := a.repository.GetUserByID(ctx, userID)
+	if err != nil {
+		return derr.JoinInternalError(err, "failed to get user by id")
+	}
+
+	err = a.storage.CreateAll("/user/profile")
+	if err != nil {
+		return derr.JoinInternalError(err, "failed to create user profile folder")
+	}
+
+	path := filepath.Join("/user/profile", strconv.FormatInt(userID, 10))
+	err = a.storage.UploadFile(path, image)
+	if err != nil {
+		return derr.JoinInternalError(err, "failed to upload image")
+	}
+
+	return nil
 }

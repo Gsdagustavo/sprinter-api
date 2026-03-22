@@ -2,6 +2,8 @@ CREATE DATABASE IF NOT EXISTS sprinter_db
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
+USE sprinter_db;
+
 CREATE TABLE users
 (
     id                INT PRIMARY KEY AUTO_INCREMENT,

@@ -144,10 +144,11 @@ func (r authenticationRepository) GetUserByID(
 	return &user, nil
 }
 
-func (r authenticationRepository) AttemptCompleteRegistration(ctx context.Context, information entities.AccountInformation) (int64, error) {
-	const query = `
-	UPDATE users SET (image_url, username, biography) VALUES (?, ?, ?) where id = ?
-	`
+func (r authenticationRepository) AttemptCompleteRegistration(
+	ctx context.Context,
+	information entities.AccountInformation,
+) (int64, error) {
+	const query = `UPDATE users SET username = ?, biography = ? WHERE id = ?`
 
 	_, err := r.conn.ExecContext(
 		ctx,

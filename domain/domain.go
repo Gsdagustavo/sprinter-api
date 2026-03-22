@@ -36,7 +36,17 @@ type AuthenticationUseCase interface {
 	) (*entities.User, error)
 
 	// AttemptCompleteRegistration tries to complete the user registration
-	AttemptCompleteRegistration(ctx context.Context, information entities.AccountInformation) (int64, error)
+	AttemptCompleteRegistration(
+		ctx context.Context,
+		information *entities.AccountInformation,
+	) (int64, error)
+
+	// RegisterProfileImage register a profile image for the user with the given ID
+	RegisterProfileImage(
+		ctx context.Context,
+		userID int64,
+		image []byte,
+	) error
 }
 
 // UserUseCase defines a use case interface with methods related to user managing

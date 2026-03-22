@@ -15,10 +15,15 @@ const (
 	PasswordMaxLetters = 32
 )
 
-// Name rules
+// Name/Username rules
 const (
 	NameMinLetters = 3
 	NameMaxLetters = 32
+)
+
+const (
+	BiographyMinLetters = 0
+	BiographyMaxLetters = 100
 )
 
 func ValidateEmail(email string) bool {
@@ -47,6 +52,14 @@ func ValidatePassword(password string) bool {
 
 func ValidateName(name string) bool {
 	if len(name) < NameMinLetters || len(name) > NameMaxLetters {
+		return false
+	}
+
+	return true
+}
+
+func ValidateBiography(biography string) bool {
+	if len(biography) > BiographyMaxLetters {
 		return false
 	}
 
