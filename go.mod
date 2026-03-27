@@ -3,7 +3,6 @@ module github.com/Gsdagustavo/sprinter-api
 go 1.26
 
 require (
-	github.com/BurntSushi/toml v1.6.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/handlers v1.5.2
@@ -12,6 +11,7 @@ require (
 	github.com/o1egl/paseto v1.0.0
 	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.48.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

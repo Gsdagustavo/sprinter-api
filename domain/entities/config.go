@@ -3,31 +3,31 @@ package entities
 // Settings holds the configuration settings for the application
 type Settings struct {
 	// Server is the data for server host
-	Server Server `toml:"Server"`
+	Server Server `yaml:"Server"`
 
 	// RepositorySettings is the settings for database connection
-	RepositorySettings RepositorySettings `toml:"RepositorySettings"`
+	RepositorySettings RepositorySettings `yaml:"RepositorySettings"`
 
 	// Environment is the environment where the application is running
-	Environment string `toml:"Environment"`
+	Environment string `yaml:"Environment"`
 
 	// LogSettings is the settings used to handle logs
-	LogSettings LogSettings `toml:"LogSettings"`
+	LogSettings LogSettings `yaml:"LogSettings"`
 
 	// Paseto is the settings for data for encryption
-	Paseto Paseto `toml:"Paseto"`
+	Paseto Paseto `yaml:"Paseto"`
 
 	// FileStorage is the settings related to file storage
-	FileStorage FileStorage `toml:"FileStorage"`
+	FileStorage FileStorage `yaml:"FileStorage"`
 
 	// SMTPConfig is the for the SMTP server connection
-	SMTPConfig SMTPConfig `toml:"STMPConfig"`
+	SMTPConfig SMTPConfig `yaml:"STMPConfig"`
 }
 
 // LogSettings is the settings used to handle logs
 type LogSettings struct {
 	// LogDir represents the directory path of the log file
-	LogDir string `toml:"LogDir"`
+	LogDir string `yaml:"LogDir"`
 }
 
 // IsProduction returns true if the application is running in production environment
@@ -43,61 +43,61 @@ func (c Settings) IsLocal() bool {
 // Server represents the configuration for a server
 type Server struct {
 	// Port is the server host port
-	Port int `toml:"Port"`
+	Port int `yaml:"Port"`
 
 	// Host is the server host address
-	Host string `toml:"Host"`
+	Host string `yaml:"Host"`
 
 	// Domain is the server domain
-	Domain string `toml:"Domain"`
+	Domain string `yaml:"Domain"`
 }
 
 // RepositorySettings contains configuration details to connect to a database
 type RepositorySettings struct {
 	// Host is the database host address
-	Host string `toml:"Host"`
+	Host string `yaml:"Host"`
 
 	// Port is the database port
-	Port string `toml:"Port"`
+	Port string `yaml:"Port"`
 
 	// Name is the database name
-	Name string `toml:"Name"`
+	Name string `yaml:"Name"`
 
 	// User is the username for database connection auth
-	User string `toml:"User"`
+	User string `yaml:"User"`
 
 	// Password is the password for database connection auth
-	Password string `toml:"Password"`
+	Password string `yaml:"Password"`
 }
 
 // Paseto represents the configuration for PASETO-based token management
 type Paseto struct {
 	// SecurityKey is the key used for token generation/validation
-	SecurityKey string `toml:"PasetoSecurityKey"`
+	SecurityKey string `yaml:"PasetoSecurityKey"`
 }
 
 // FileStorage represents the configuration for storing files.
 type FileStorage struct {
 	// StorageFolder is the folder for storing files
-	StorageFolder string `toml:"StorageFolder"`
+	StorageFolder string `yaml:"StorageFolder"`
 }
 
 // SMTPConfig represents the configuration for connecting to an SMTP server
 type SMTPConfig struct {
 	// Host specifies the hostname or IP address of the SMTP server
-	Host string `toml:"Host"`
+	Host string `yaml:"Host"`
 
 	// Port specifies the port number for the SMTP server connection
-	Port string `toml:"Port"`
+	Port string `yaml:"Port"`
 
 	// User specifies the username for authentication with the SMTP server
-	User string `toml:"User"`
+	User string `yaml:"User"`
 
 	// Password is the SMTP password credential
-	Password string `toml:"Password"`
+	Password string `yaml:"Password"`
 
 	// From specifies the sender's email address for the SMTP server
-	From string `toml:"From"`
+	From string `yaml:"From"`
 }
 
 // Addr returns the SMTP server address in the format "host:port"

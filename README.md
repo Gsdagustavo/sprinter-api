@@ -24,7 +24,7 @@ It is designed to operate in conjunction with the Sprinter frontend application.
 The local development configuration is defined in the file:
 
 ```
-dev-settings.toml
+dev-settings.yml
 ```
 
 It is strongly recommended not to modify this file. Changes may disrupt API services or lead to unintended behavior.
@@ -37,7 +37,7 @@ To run the API in a local development environment, follow the steps below.
 
 ### 1. Create the Database Container
 
-Create and start the database container using the configuration specified in `dev-settings.toml`.
+Create and start the database container using the configuration specified in `dev-settings.yml`.
 
 Ensure that:
 
@@ -50,7 +50,7 @@ Start the application using the following program arguments:
 
 ```
 -action run
--settings dev-settings.toml
+-settings dev-settings.yml
 ```
 
 These arguments must be provided through your development environment or command-line interface.
@@ -68,6 +68,6 @@ These arguments must be provided through your development environment or command
 
 ## Additional Notes
 
-* Always use `dev-settings.toml` for local development.
+* Always use `dev-settings.yml` for local development.
 * Avoid committing sensitive configuration changes.
 * Ensure that the database container is fully initialized before starting the API.
