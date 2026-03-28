@@ -45,6 +45,12 @@ type AuthRepository interface {
 		ctx context.Context,
 		credentials entities.UserCredentials,
 	) (bool, error)
+
+	// UpdateUserProfile updates a user's name and description
+	UpdateUserProfile(
+		ctx context.Context,
+		user *entities.User,
+	) error
 }
 
 // ProductRepository defines methods for managing product data.

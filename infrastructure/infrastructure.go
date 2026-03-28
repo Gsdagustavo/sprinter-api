@@ -30,7 +30,7 @@ func SetupModules(r *mux.Router, config entities.Settings) error {
 
 	// Use Cases
 	authUseCases := usecases.NewAuthenticationUseCase(authRepository, config.Paseto.SecurityKey)
-	_ = usecases.NewUserUseCases(fileStorage, config.FileStorage.StorageFolder)
+	_ = usecases.NewUserUseCases(authRepository, fileStorage, config.FileStorage.StorageFolder)
 	productUseCases := usecases.NewProductUseCases(productRepository)
 
 	// Modules

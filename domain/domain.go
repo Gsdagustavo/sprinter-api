@@ -38,6 +38,14 @@ type AuthenticationUseCase interface {
 
 // UserUseCase defines a use case interface with methods related to user managing
 type UserUseCase interface {
+	// Edit the user name and description
+	EditUserProfile(
+		ctx context.Context,
+		user *entities.User,
+		name string,
+		description string,
+	) (*entities.User, error)
+
 	// SaveUserProfilePicture saves the profile picture of the user with the given ID and
 	// returns the updated file path
 	SaveUserProfilePicture(

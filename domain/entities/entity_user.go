@@ -30,8 +30,10 @@ type User struct {
 	// CreatedAt is the date of creation in database.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 
-	// CreatedAt is the last date of update in database.
+	// ModifiedAt is the last date of update in database.
 	ModifiedAt time.Time `json:"modified_at,omitempty"`
+	// Description is the description of the user.
+	Description string `json:"description,omitempty"`
 }
 
 // UserCredentials is an entity that represents a user credentials .

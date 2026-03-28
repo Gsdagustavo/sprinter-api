@@ -143,3 +143,37 @@ func (r authenticationRepository) GetUserByID(
 
 	return &user, nil
 }
+
+func (r authenticationRepository) UpdateUserProfile(
+	ctx context.Context,
+	user *entities.User,
+) error {
+	const query = `
+	UPDATE users
+	SET name = ?,
+		description = ?
+	WHERE id = ?
+	`
+
+	result, err := r.conn.ExecContext(
+		ctx,
+		query,
+		&user.Name,
+		&user.Description,
+		user.ID,
+	)
+	if err != nil {
+		return derr.JoinInternalError(err, "failed to execute query")
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return derr.JoinInternalError(err, "failed to get rows affected")
+	}
+
+	if rowsAffected == 0 {
+		return derr.NotFoundError
+	}
+
+	return nil
+}
