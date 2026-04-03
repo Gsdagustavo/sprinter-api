@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
-	"github.com/Gsdagustavo/sprinter-api/domain/logger"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -20,12 +20,8 @@ import (
 const shutdownTime = time.Second * 15
 
 func main() {
-	err := logger.InitLogger()
-	if err != nil {
-		slog.Error("failed to initialize logger", logger.Err(err))
-	}
-
-	err = start()
+	logger.InitLogger()
+	err := start()
 	if err != nil {
 		slog.Error("failed to start server", slog.String("cause", err.Error()))
 		log.Fatal(err)

@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
-	"github.com/Gsdagustavo/sprinter-api/domain/logger"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 )
 
 type SuccessfulResponse struct {
