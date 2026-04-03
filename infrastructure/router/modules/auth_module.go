@@ -10,8 +10,8 @@ import (
 	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
-	"github.com/Gsdagustavo/sprinter-api/domain/logger"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/gorilla/mux"
 )
 
@@ -27,6 +27,10 @@ func NewAuthModule(authUseCases domain.AuthenticationUseCase) router.Module {
 		name:         "Authentication",
 		path:         "/auth",
 	}
+}
+
+type AuthenticationResponse struct {
+	Token string `json:"token"`
 }
 
 func (m authModule) Name() string {
@@ -49,6 +53,12 @@ func (m authModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router)
 			Path:        "/register",
 			Description: "Attempt user register",
 			Handler:     m.register,
+			HttpMethods: []string{http.MethodPost},
+		},
+		{
+			Path:        "/completeRegistration",
+			Description: "Attempt complete user registration",
+			Handler:     m.completeRegistration,
 			HttpMethods: []string{http.MethodPost},
 		},
 	}
@@ -156,13 +166,14 @@ func (m authModule) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := m.authUseCases.AttemptLogin(ctx, credentials)
+	token, err := m.authUseCases.AttemptLogin(ctx, credentials)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt login", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}
 
+	response := AuthenticationResponse{Token: token}
 	w.Header().Set("Authorization", "Bearer "+response.Token)
 	err = router.Write(w, response)
 	if err != nil {
@@ -188,14 +199,15 @@ func (m authModule) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := m.authUseCases.AttemptRegister(ctx, credentials)
+	token, err := m.authUseCases.AttemptRegister(ctx, credentials)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt register", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}
 
-	w.Header().Set("Authorization", "Bearer "+response.Token)
+	response := AuthenticationResponse{Token: token}
+	w.Header().Set("Authorization", "Bearer "+token)
 	err = router.Write(w, response)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
@@ -220,15 +232,47 @@ func (m authModule) me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := m.authUseCases.AttemptRegister(ctx, credentials)
+	token, err := m.authUseCases.AttemptRegister(ctx, credentials)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt register", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}
 
-	w.Header().Set("Authorization", "Bearer "+response.Token)
+	response := AuthenticationResponse{Token: token}
+	w.Header().Set("Authorization", "Bearer "+token)
 	err = router.Write(w, response)
+	if err != nil {
+		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
+	}
+}
+
+func (m authModule) completeRegistration(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to read request body", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	var information entities.AccountInformation
+	err = json.Unmarshal(body, &information)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to unmarshal request body", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	err = m.authUseCases.AttemptCompleteRegistration(ctx, information)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to attempt register", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	err = router.Write(w, router.NewSuccessfulResponse())
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
 	}

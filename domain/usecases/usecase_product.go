@@ -14,11 +14,16 @@ type productUseCases struct {
 	repository datastore.ProductRepository
 }
 
-func NewProductUseCases(r datastore.ProductRepository) domain.ProductUseCase {
-	return productUseCases{repository: r}
+func NewProductUseCases(repository datastore.ProductRepository) domain.ProductUseCase {
+	return productUseCases{
+		repository: repository,
+	}
 }
 
-func (p productUseCases) AddNewProduct(ctx context.Context, product *entities.Product) (int64, error) {
+func (p productUseCases) AddNewProduct(
+	ctx context.Context,
+	product *entities.Product,
+) (int64, error) {
 	err := rules.ValidateProduct(product)
 	if err != nil {
 		return 0, err
@@ -28,11 +33,13 @@ func (p productUseCases) AddNewProduct(ctx context.Context, product *entities.Pr
 }
 
 func (p productUseCases) DeleteProduct(ctx context.Context, id int64) error {
-
 	return p.repository.DeleteProduct(ctx, id)
 }
 
-func (p productUseCases) UpdateProduct(ctx context.Context, product *entities.Product) error {
+func (p productUseCases) UpdateProduct(
+	ctx context.Context,
+	product *entities.Product,
+) error {
 	err := rules.ValidateProduct(product)
 	if err != nil {
 		return err
@@ -41,7 +48,10 @@ func (p productUseCases) UpdateProduct(ctx context.Context, product *entities.Pr
 	return p.repository.UpdateProduct(ctx, product)
 }
 
-func (p productUseCases) GetProductByID(ctx context.Context, id int64) (*entities.Product, error) {
+func (p productUseCases) GetProductByID(
+	ctx context.Context,
+	id int64,
+) (*entities.Product, error) {
 	return p.repository.GetProductByID(ctx, id)
 }
 
@@ -51,7 +61,7 @@ func (p productUseCases) GetProducts(
 ) (*entities.PaginatedList[entities.Product], error) {
 	products, err := p.repository.GetProducts(ctx, filter)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "failed to get products")
+		return nil, derr.JoinError("failed to get products", err)
 	}
 
 	return products, nil

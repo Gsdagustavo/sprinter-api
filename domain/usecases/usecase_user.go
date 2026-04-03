@@ -5,23 +5,24 @@ import (
 	"path"
 
 	"github.com/Gsdagustavo/sprinter-api/domain"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore"
 )
 
 func NewUserUseCases(
 	storage filestore.FileStorage,
-	storageFolder string,
+	storageConfig entities.FileStorageSettings,
 ) domain.UserUseCase {
 	return userUseCase{
 		storage:       storage,
-		storageFolder: storageFolder,
+		storageConfig: storageConfig,
 	}
 }
 
 type userUseCase struct {
 	storage       filestore.FileStorage
-	storageFolder string
+	storageConfig entities.FileStorageSettings
 }
 
 func (u userUseCase) SaveUserProfilePicture(
@@ -33,12 +34,12 @@ func (u userUseCase) SaveUserProfilePicture(
 
 	err := u.storage.DeleteFile(imagePath)
 	if err != nil {
-		return "", derr.JoinInternalError(err, "failed to delete file")
+		return "", derr.JoinError("failed to delete file", err)
 	}
 
 	err = u.storage.UploadFile(imagePath, image)
 	if err != nil {
-		return "", derr.JoinInternalError(err, "failed to upload file")
+		return "", derr.JoinError("failed to upload file", err)
 	}
 
 	return imagePath, nil
@@ -47,7 +48,7 @@ func (u userUseCase) SaveUserProfilePicture(
 func (u userUseCase) getUserFolder(
 	userID int64,
 ) string {
-	storageFolder := u.storageFolder
+	storageFolder := u.storageConfig.StorageFolder
 	userFolder := path.Join(storageFolder, fmt.Sprintf("%d", userID))
 	return userFolder
 }

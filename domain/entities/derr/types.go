@@ -57,6 +57,6 @@ func NewUnauthorizedError(message string) ClientError {
 	}
 }
 
-func JoinInternalError(err error, message string) error {
-	return NewInternalError(errors.Join(errors.New(message), err).Error())
+func JoinError(message string, err error) error {
+	return errors.Join(errors.New(message), err)
 }

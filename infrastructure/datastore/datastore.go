@@ -45,6 +45,12 @@ type AuthRepository interface {
 		ctx context.Context,
 		credentials entities.UserCredentials,
 	) (bool, error)
+
+	// AttemptCompleteRegistration tries to complete the user registration
+	AttemptCompleteRegistration(
+		ctx context.Context,
+		information entities.AccountInformation,
+	) error
 }
 
 // ProductRepository defines methods for managing product data.

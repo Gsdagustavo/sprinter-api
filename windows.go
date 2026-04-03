@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/kardianos/service"
 	"gopkg.in/yaml.v3"
 )
@@ -22,20 +23,20 @@ func start() error {
 	configsPath, action, terminal := loadFlags()
 	cfg, err := readCFGFile(configsPath)
 	if err != nil {
-		return errors.Join(errors.New("failed to read config file"), err)
+		return derr.JoinError("failed to read config file", err)
 	}
 
 	if !terminal {
 		file, err := configureOutput(cfg.LogSettings.LogDir)
 		if err != nil {
-			return errors.Join(errors.New("failed to configure log outputs"), err)
+			return derr.JoinError("failed to configure log outputs", err)
 		}
 		defer file.Close()
 	}
 
 	s, err := newService(*cfg)
 	if err != nil {
-		return errors.Join(errors.New("failed to create service"), err)
+		return derr.JoinError("failed to create service", err)
 	}
 
 	if strings.TrimSpace(action) == "" {
@@ -48,28 +49,28 @@ func start() error {
 
 		err = s.Run()
 		if err != nil {
-			return errors.Join(errors.New("failed to run service"), err)
+			return derr.JoinError("failed to run service", err)
 		}
 	case "uninstall":
 		slog.Info("uninstalling service")
 
 		err = s.Uninstall()
 		if err != nil {
-			return errors.Join(errors.New("failed to uninstall service"), err)
+			return derr.JoinError("failed to uninstall service", err)
 		}
 	case "install":
 		slog.Info("install service")
 
 		err = s.Install()
 		if err != nil {
-			return errors.Join(errors.New("failed to install service"), err)
+			return derr.JoinError("failed to install service", err)
 		}
 	case "stop":
 		log.Println("stopping service")
 
 		err = s.Stop()
 		if err != nil {
-			return errors.Join(errors.New("failed to stop service"), err)
+			return derr.JoinError("failed to stop service", err)
 		}
 	}
 
@@ -126,7 +127,7 @@ func configureOutput(logFolder string) (*os.File, error) {
 
 	err := os.MkdirAll(logFolder, os.ModePerm)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to create log folder"))
+		return nil, derr.JoinError("failed to create log folder", err)
 	}
 
 	file, err := os.OpenFile(logName, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
@@ -134,11 +135,11 @@ func configureOutput(logFolder string) (*os.File, error) {
 		if os.IsNotExist(err) {
 			err = os.WriteFile(logName, []byte(""), os.ModePerm)
 			if err != nil {
-				return nil, errors.Join(errors.New("failed to create log file"))
+				return nil, derr.JoinError("failed to write to file", err)
 			}
 		}
 
-		return nil, errors.Join(errors.New("failed to open log file"), err)
+		return nil, derr.JoinError("failed to open log file", err)
 	}
 
 	log.SetOutput(io.MultiWriter(os.Stdout, file))
@@ -148,19 +149,19 @@ func configureOutput(logFolder string) (*os.File, error) {
 func readCFGFile(cfgPath string) (*entities.Settings, error) {
 	file, err := os.Open(cfgPath)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to open file"), err)
+		return nil, derr.JoinError("failed to open file", err)
 	}
 	defer file.Close()
 
 	bytes, err := io.ReadAll(file)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to read file"), err)
+		return nil, derr.JoinError("failed to read file", err)
 	}
 
 	var cfg entities.Settings
 	err = yaml.Unmarshal(bytes, &cfg)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to decode file"), err)
+		return nil, derr.JoinError("failed to decode file", err)
 	}
 
 	return &cfg, nil
@@ -193,7 +194,7 @@ func newService(cfg entities.Settings) (service.Service, error) {
 
 	s, err := service.New(p, svcConfig)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to create service"), err)
+		return nil, derr.JoinError("failed to create service", err)
 	}
 
 	return s, nil

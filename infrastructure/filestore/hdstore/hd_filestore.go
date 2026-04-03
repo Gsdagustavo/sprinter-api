@@ -1,12 +1,12 @@
 package hdstore
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore"
 )
 
@@ -18,7 +18,7 @@ func NewHDFileStorage(
 	config entities.Settings,
 ) filestore.FileStorage {
 	fileStorage := hdFileStorage{
-		storageFolder: config.FileStorage.StorageFolder,
+		storageFolder: config.FileStorageSettings.StorageFolder,
 	}
 
 	err := fileStorage.Setup()
@@ -33,7 +33,7 @@ func (h hdFileStorage) Setup() error {
 	// Create the storage folder if not found
 	err := os.MkdirAll(h.storageFolder, os.ModePerm)
 	if err != nil {
-		return errors.Join(errors.New("failed to create folder"))
+		return derr.JoinError("failed to create folder", err)
 	}
 
 	return nil
@@ -50,7 +50,7 @@ func (h hdFileStorage) Exists(path string) (bool, error) {
 			return false, nil
 		}
 
-		return false, errors.Join(errors.New("failed to check if file exists"))
+		return false, derr.JoinError("failed to check if file exists", err)
 	}
 	return true, nil
 }
@@ -76,7 +76,7 @@ func (h hdFileStorage) ServeFile(path string) (*os.File, error) {
 
 	file, err := os.Open(fullPath)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to open file"))
+		return nil, derr.JoinError("failed to open file", err)
 	}
 
 	return file, nil
@@ -93,14 +93,14 @@ func (h hdFileStorage) UploadFile(
 	fullPath := fmt.Sprintf("%s%s", h.storageFolder, path)
 	file, err := os.Create(fullPath)
 	if err != nil {
-		return errors.Join(errors.New("failed to create file"))
+		return derr.JoinError("failed to create file", err)
 	}
 	defer file.Close()
 
 	// Write bytes to the file
 	_, err = file.Write(bytes)
 	if err != nil {
-		return errors.Join(errors.New("failed to write to file"))
+		return derr.JoinError("failed to write to file", err)
 	}
 
 	return nil
@@ -120,13 +120,13 @@ func (h hdFileStorage) DeleteFile(path string) error {
 			return nil
 		}
 
-		return errors.Join(errors.New("failed to stat file"))
+		return derr.JoinError("failed to stat file", err)
 	}
 
 	// Delete the file
 	err = os.Remove(fullPath)
 	if err != nil {
-		return errors.Join(errors.New("failed to remove file"))
+		return derr.JoinError("failed to remove file", err)
 	}
 
 	return nil

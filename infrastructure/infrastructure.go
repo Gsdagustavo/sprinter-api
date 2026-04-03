@@ -1,12 +1,12 @@
 package infrastructure
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/domain/usecases"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore/hdstore"
@@ -19,7 +19,7 @@ func SetupModules(r *mux.Router, config entities.Settings) error {
 	// Repository settings
 	settings, err := repositories.NewSettingsRepository(config)
 	if err != nil {
-		return errors.Join(errors.New("failed to create settings repository"), err)
+		return derr.JoinError("failed to create settings repository", err)
 	}
 
 	fileStorage := hdstore.NewHDFileStorage(config)
@@ -29,8 +29,8 @@ func SetupModules(r *mux.Router, config entities.Settings) error {
 	productRepository := repositories.NewProductRepository(settings)
 
 	// Use Cases
-	authUseCases := usecases.NewAuthenticationUseCase(authRepository, config.PasetoSettings.SecurityKey)
-	_ = usecases.NewUserUseCases(fileStorage, config.FileStorage.StorageFolder)
+	authUseCases := usecases.NewAuthenticationUseCase(authRepository, config.PasetoSettings.SecurityKey, fileStorage)
+	_ = usecases.NewUserUseCases(fileStorage, config.FileStorageSettings)
 	productUseCases := usecases.NewProductUseCases(productRepository)
 
 	// Modules
