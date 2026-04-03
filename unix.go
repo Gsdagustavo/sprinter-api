@@ -14,6 +14,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/kardianos/service"
 )
 
@@ -25,23 +26,23 @@ func start() error {
 
 	cfg, err := readCFGFile(configsPath)
 	if err != nil {
-		return errors.Join(errors.New("failed to read config file"), err)
+		return derr.JoinError("failed to read config file", err)
 	}
 
 	file, err := configureOutput(cfg.LogSettings.LogDir)
 	if err != nil {
-		return errors.Join(errors.New("failed to configure log outputs"), err)
+		return derr.JoinError("failed to configure log outputs", err)
 	}
 	defer file.Close()
 
 	s, err := newService(*cfg)
 	if err != nil {
-		return errors.Join(errors.New("failed to create service"), err)
+		return derr.JoinError("failed to create service", err)
 	}
 
 	err = s.Run()
 	if err != nil {
-		return errors.Join(errors.New("failed to run service"), err)
+		return derr.JoinError("failed to run service", err)
 	}
 
 	return nil
@@ -73,7 +74,7 @@ func configureOutput(logFolder string) (*os.File, error) {
 
 	err := os.MkdirAll(logFolder, os.ModePerm)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to create log folder"))
+		return nil, derr.JoinError("failed to create log folder", err)
 	}
 
 	file, err := os.OpenFile(logName, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
@@ -81,11 +82,11 @@ func configureOutput(logFolder string) (*os.File, error) {
 		if os.IsNotExist(err) {
 			err = os.WriteFile(logName, []byte(""), os.ModePerm)
 			if err != nil {
-				return nil, errors.Join(errors.New("failed to create log file"))
+				return nil, derr.JoinError("failed to write to file", err)
 			}
 		}
 
-		return nil, errors.Join(errors.New("failed to open log file"), err)
+		return nil, derr.JoinError("failed to open log file", err)
 	}
 
 	log.SetOutput(io.MultiWriter(os.Stdout, file))
@@ -95,20 +96,20 @@ func configureOutput(logFolder string) (*os.File, error) {
 func readCFGFile(cfgPath string) (*entities.Settings, error) {
 	file, err := os.Open(cfgPath)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to open file"), err)
+		return nil, derr.JoinError("failed to open file", err)
 	}
 	defer file.Close()
 
 	b, err := io.ReadAll(file)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to read file"), err)
+		return nil, derr.JoinError("failed to read file", err)
 	}
 
 	var cfg entities.Settings
 
 	_, err = toml.Decode(string(b), &cfg)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to decode file"), err)
+		return nil, derr.JoinError("failed to decode file", err)
 	}
 
 	return &cfg, nil

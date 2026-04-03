@@ -12,13 +12,13 @@ type AuthenticationUseCase interface {
 	AttemptLogin(
 		ctx context.Context,
 		credentials entities.UserCredentials,
-	) (*entities.AuthenticationResponse, error)
+	) (string, error)
 
 	// AttemptRegister attempts to register a new user in the database
 	AttemptRegister(
 		ctx context.Context,
 		credentials entities.UserCredentials,
-	) (*entities.AuthenticationResponse, error)
+	) (string, error)
 
 	// GetUserByEmail returns the user with the given email
 	GetUserByEmail(ctx context.Context, email string) (*entities.User, error)
@@ -38,11 +38,11 @@ type AuthenticationUseCase interface {
 	// AttemptCompleteRegistration tries to complete the user registration
 	AttemptCompleteRegistration(
 		ctx context.Context,
-		information *entities.AccountInformation,
-	) (int64, error)
+		information entities.AccountInformation,
+	) error
 
-	// RegisterProfileImage register a profile image for the user with the given ID
-	RegisterProfileImage(
+	// UploadProfileImage uploads a profile image for the user with the given ID
+	UploadProfileImage(
 		ctx context.Context,
 		userID int64,
 		image []byte,

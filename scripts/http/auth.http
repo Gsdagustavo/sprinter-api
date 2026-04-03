@@ -10,6 +10,6 @@ POST http://localhost:8000/api/auth/register
 
 {
     "name": "Gustavo",
-    "email": "gustavo@gmail.com",
-    "password": "Rg54757185#"
+    "email": "gustavos1@gmail.com",
+    "password": "RG547571856GADFE#"
 }

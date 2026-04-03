@@ -34,12 +34,12 @@ func (u userUseCase) SaveUserProfilePicture(
 
 	err := u.storage.DeleteFile(imagePath)
 	if err != nil {
-		return "", derr.JoinInternalError(err, "failed to delete file")
+		return "", derr.JoinError("failed to delete file", err)
 	}
 
 	err = u.storage.UploadFile(imagePath, image)
 	if err != nil {
-		return "", derr.JoinInternalError(err, "failed to upload file")
+		return "", derr.JoinError("failed to upload file", err)
 	}
 
 	return imagePath, nil

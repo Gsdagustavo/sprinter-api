@@ -25,13 +25,13 @@ func NewSuccessfulResponse() SuccessfulResponse {
 func Write(w http.ResponseWriter, v any) error {
 	bytes, err := json.Marshal(v)
 	if err != nil {
-		return errors.New("failed to marshal response body")
+		return derr.JoinError("failed to marshal response body", err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write(bytes)
 	if err != nil {
-		return errors.New("failed to write response body")
+		return derr.JoinError("failed to write response body", err)
 	}
 
 	return nil

@@ -43,12 +43,12 @@ func (r productRepository) AddNewProduct(ctx context.Context, product *entities.
 		&product.ImageURL,
 	)
 	if err != nil {
-		return -1, derr.JoinInternalError(err, "failed to execute query")
+		return -1, derr.JoinError("failed to execute query", err)
 	}
 
 	productID, err := res.LastInsertId()
 	if err != nil {
-		return -1, derr.JoinInternalError(err, "failed to get last inserted ID")
+		return -1, derr.JoinError("failed to get last inserted ID", err)
 	}
 
 	return productID, nil
@@ -59,12 +59,12 @@ func (r productRepository) DeleteProduct(ctx context.Context, id int64) error {
 
 	res, err := r.conn.ExecContext(ctx, query, id)
 	if err != nil {
-		return derr.JoinInternalError(err, "failed to execute query")
+		return derr.JoinError("failed to execute query", err)
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return derr.JoinInternalError(err, "failed to get rows affected")
+		return derr.JoinError("failed to get rows affected", err)
 	}
 
 	if rowsAffected == 0 {
@@ -87,12 +87,12 @@ func (r productRepository) UpdateProduct(ctx context.Context, product *entities.
 
 	result, err := r.conn.ExecContext(ctx, query, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Stock, product.ID)
 	if err != nil {
-		return derr.JoinInternalError(err, "failed to execute query")
+		return derr.JoinError("failed to execute query", err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return derr.JoinInternalError(err, "failed to get rows affected")
+		return derr.JoinError("failed to get rows affected", err)
 	}
 
 	if rowsAffected == 0 {
@@ -124,7 +124,7 @@ func (r productRepository) GetProductByID(ctx context.Context, id int64) (*entit
 		&product.ImageURL,
 	)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "failed to query or scan")
+		return nil, derr.JoinError("failed to query or scan", err)
 	}
 
 	return &product, nil
@@ -160,7 +160,7 @@ func (r productRepository) GetProducts(
 
 	rows, err := r.conn.QueryContext(ctx, query)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "failed to query")
+		return nil, derr.JoinError("failed to query", err)
 	}
 	defer rows.Close()
 
@@ -176,7 +176,7 @@ func (r productRepository) GetProducts(
 			&product.ImageURL,
 		)
 		if err != nil {
-			return nil, derr.JoinInternalError(err, "failed to scan")
+			return nil, derr.JoinError("failed to scan", err)
 		}
 
 		products = append(products, product)
@@ -187,7 +187,7 @@ func (r productRepository) GetProducts(
 	var totalCount int64
 	err = r.conn.QueryRowContext(ctx, countQuery).Scan(&totalCount)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "failed to query or scan count")
+		return nil, derr.JoinError("failed to query or scan count", err)
 	}
 
 	pages := datastore.GetTotalPages(totalCount, filter)

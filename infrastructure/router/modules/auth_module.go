@@ -29,6 +29,10 @@ func NewAuthModule(authUseCases domain.AuthenticationUseCase) router.Module {
 	}
 }
 
+type AuthenticationResponse struct {
+	Token string `json:"token"`
+}
+
 func (m authModule) Name() string {
 	return m.name
 }
@@ -162,13 +166,14 @@ func (m authModule) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := m.authUseCases.AttemptLogin(ctx, credentials)
+	token, err := m.authUseCases.AttemptLogin(ctx, credentials)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt login", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}
 
+	response := AuthenticationResponse{Token: token}
 	w.Header().Set("Authorization", "Bearer "+response.Token)
 	err = router.Write(w, response)
 	if err != nil {
@@ -194,14 +199,15 @@ func (m authModule) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := m.authUseCases.AttemptRegister(ctx, credentials)
+	token, err := m.authUseCases.AttemptRegister(ctx, credentials)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt register", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}
 
-	w.Header().Set("Authorization", "Bearer "+response.Token)
+	response := AuthenticationResponse{Token: token}
+	w.Header().Set("Authorization", "Bearer "+token)
 	err = router.Write(w, response)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
@@ -226,14 +232,15 @@ func (m authModule) me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := m.authUseCases.AttemptRegister(ctx, credentials)
+	token, err := m.authUseCases.AttemptRegister(ctx, credentials)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt register", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}
 
-	w.Header().Set("Authorization", "Bearer "+response.Token)
+	response := AuthenticationResponse{Token: token}
+	w.Header().Set("Authorization", "Bearer "+token)
 	err = router.Write(w, response)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
@@ -258,14 +265,14 @@ func (m authModule) completeRegistration(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	response, err := m.authUseCases.AttemptCompleteRegistration(ctx, information)
+	err = m.authUseCases.AttemptCompleteRegistration(ctx, information)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to attempt register", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}
 
-	err = router.Write(w, response)
+	err = router.Write(w, router.NewSuccessfulResponse())
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
 	}

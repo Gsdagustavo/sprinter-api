@@ -50,7 +50,7 @@ type AuthRepository interface {
 	AttemptCompleteRegistration(
 		ctx context.Context,
 		information entities.AccountInformation,
-	) (int64, error)
+	) error
 }
 
 // ProductRepository defines methods for managing product data.

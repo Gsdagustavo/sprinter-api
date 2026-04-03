@@ -49,20 +49,14 @@ type UserCredentials struct {
 // AccountInformation is an entity that represents the information for user complete his registration
 type AccountInformation struct {
 	// ID is the unique identifier for the user
-	ID int64 `json:"id,omitempty"`
-
-	// ImageURL is the url for the user's profile picture
-	ImageURL string `json:"image_url,omitempty"`
+	ID int64 `json:"id"`
 
 	// Username is the name identifier for the user
 	Username string `json:"username,omitempty"`
 
 	// Biography is the description for the user
 	Biography string `json:"biography,omitempty"`
-}
 
-// AuthenticationResponse is a response from an authentication attempt.
-type AuthenticationResponse struct {
-	// Token is the authentication token returned in the authentication response.
-	Token string `json:"token,omitempty"`
+	// ImageURL is the url for the user's profile picture
+	ImageURL string `json:"image_url,omitempty"`
 }

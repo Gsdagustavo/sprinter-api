@@ -53,7 +53,7 @@ func (r authenticationRepository) GetUserByEmail(
 			return nil, derr.NotFoundError
 		}
 
-		return nil, derr.JoinInternalError(err, "failed to scan")
+		return nil, derr.JoinError("failed to scan", err)
 	}
 
 	return &user, nil
@@ -73,12 +73,12 @@ func (r authenticationRepository) AttemptRegister(
 		credentials.Password,
 	)
 	if err != nil {
-		return -1, derr.JoinInternalError(err, "failed to execute query")
+		return -1, derr.JoinError("failed to execute query", err)
 	}
 
 	userID, err := result.LastInsertId()
 	if err != nil {
-		return -1, derr.JoinInternalError(err, "failed to get last inserted ID")
+		return -1, derr.JoinError("failed to get last inserted ID", err)
 	}
 
 	return userID, nil
@@ -101,7 +101,7 @@ func (r authenticationRepository) CheckUserCredentials(
 			return false, derr.NotFoundError
 		}
 
-		return false, derr.JoinInternalError(err, "failed to query or scan")
+		return false, derr.JoinError("failed to query or scan", err)
 	}
 
 	valid := util.CheckValidPassword(credentials.Password, password)
@@ -138,7 +138,7 @@ func (r authenticationRepository) GetUserByID(
 			return nil, derr.NotFoundError
 		}
 
-		return nil, derr.JoinInternalError(err, "failed to scan")
+		return nil, derr.JoinError("failed to scan", err)
 	}
 
 	return &user, nil
@@ -147,19 +147,18 @@ func (r authenticationRepository) GetUserByID(
 func (r authenticationRepository) AttemptCompleteRegistration(
 	ctx context.Context,
 	information entities.AccountInformation,
-) (int64, error) {
+) error {
 	const query = `UPDATE users SET username = ?, biography = ? WHERE id = ?`
 
 	_, err := r.conn.ExecContext(
 		ctx,
 		query,
-		information.ImageURL,
 		information.Username,
 		information.Biography,
 	)
 	if err != nil {
-		return -1, derr.JoinInternalError(err, "failed to execute query")
+		return derr.JoinError("failed to execute query", err)
 	}
 
-	return information.ID, nil
+	return nil
 }

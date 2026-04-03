@@ -61,7 +61,7 @@ func (p productUseCases) GetProducts(
 ) (*entities.PaginatedList[entities.Product], error) {
 	products, err := p.repository.GetProducts(ctx, filter)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "failed to get products")
+		return nil, derr.JoinError("failed to get products", err)
 	}
 
 	return products, nil

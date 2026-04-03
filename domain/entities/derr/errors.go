@@ -13,12 +13,16 @@ var (
 
 var (
 	InvalidCredentials = NewClientError("INVALID_CREDENTIALS", "Invalid credentials")
+	InvalidEmail       = NewClientError("INVALID_EMAIL", "Invalid email")
 	UserAlreadyExists  = NewClientError("USER_ALREADY_EXISTS", "User already exists")
 )
 
 var (
-	InvalidUsername  = NewClientError("INVALID_USERNAME", "Invalid username")
-	InvalidBiography = NewClientError("INVALID_BIOGRAPHY", "Invalid biography")
+	InvalidUsername    = NewClientError("INVALID_USERNAME", "Invalid username")
+	BiographyIsTooLong = NewClientError("BIOGRAPHY_IS_TOO_LONG", "Biography is too long")
+	NameIsTooShort     = NewClientError("NAME_IS_TOO_SHORT", "Name is too short")
+	NameIsTooLong      = NewClientError("NAME_IS_TOO_LONG", "Name is too long")
+	WeakPassword       = NewClientError("WEAK_PASSWORD", "Weak password")
 )
 
 var (

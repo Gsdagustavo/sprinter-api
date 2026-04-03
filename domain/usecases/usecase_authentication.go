@@ -37,77 +37,73 @@ type authenticationUseCase struct {
 func (a authenticationUseCase) AttemptLogin(
 	ctx context.Context,
 	credentials entities.UserCredentials,
-) (*entities.AuthenticationResponse, error) {
-	if !rules.ValidateCredentials(credentials) {
-		return nil, derr.InvalidCredentials
+) (string, error) {
+	if err := rules.ValidateCredentials(credentials); err != nil {
+		return "", derr.InvalidCredentials
 	}
 
 	userByEmail, err := a.repository.GetUserByEmail(ctx, credentials.Email)
 	if err != nil && !errors.Is(err, derr.NotFoundError) {
-		return nil, derr.JoinInternalError(err, "failed to get user by email")
+		return "", derr.JoinError("failed to get user by email", err)
 	}
 
 	if userByEmail == nil {
-		return nil, derr.InvalidCredentials
+		return "", derr.InvalidCredentials
 	}
 
 	valid, err := a.repository.CheckUserCredentials(ctx, credentials)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "login attempt failed")
+		return "", derr.JoinError("login attempt failed", err)
 	}
 
 	if !valid {
-		return nil, derr.InvalidCredentials
+		return "", derr.InvalidCredentials
 	}
 
 	token, err := util.GetNewAuthToken(userByEmail.ID, a.securityKey)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "failed to generate token")
+		return "", derr.JoinError("failed to generate token", err)
 	}
 
-	return &entities.AuthenticationResponse{Token: token}, nil
+	return token, nil
 }
 
 func (a authenticationUseCase) AttemptRegister(
 	ctx context.Context,
 	credentials entities.UserCredentials,
-) (*entities.AuthenticationResponse, error) {
-	if rules.ValidateName(credentials.Name) == false {
-		return nil, derr.InvalidCredentials
-	}
-
-	if !rules.ValidateCredentials(credentials) {
-		return nil, derr.InvalidCredentials
+) (string, error) {
+	if err := rules.ValidateCredentials(credentials); err != nil {
+		return "", err
 	}
 
 	// Check if a user with the email already exists in the database
 	userByEmail, err := a.repository.GetUserByEmail(ctx, credentials.Email)
 	if err != nil && !errors.Is(err, derr.NotFoundError) {
-		return nil, derr.JoinInternalError(err, "failed to get user by email")
+		return "", derr.JoinError("failed to get user by email", err)
 	}
 
 	if userByEmail != nil {
-		return nil, derr.UserAlreadyExists
+		return "", derr.UserAlreadyExists
 	}
 
 	hashedPassword, err := util.Hash(credentials.Password)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "failed to hash password")
+		return "", derr.JoinError("failed to hash password", err)
 	}
 
 	credentials.Password = hashedPassword
 
 	userID, err := a.repository.AttemptRegister(ctx, credentials)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "register attempt failed")
+		return "", derr.JoinError("register attempt failed", err)
 	}
 
 	token, err := util.GetNewAuthToken(userID, a.securityKey)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "failed to generate token")
+		return "", derr.JoinError("failed to generate token", err)
 	}
 
-	return &entities.AuthenticationResponse{Token: token}, nil
+	return token, nil
 }
 
 func (a authenticationUseCase) GetUserByEmail(
@@ -130,7 +126,7 @@ func (a authenticationUseCase) GetUserByToken(
 ) (*entities.User, error) {
 	id, expired, err := util.GetUserIDFromToken(token, a.securityKey)
 	if err != nil {
-		return nil, derr.JoinInternalError(err, "failed to get user ID from token")
+		return nil, derr.JoinError("failed to get user ID from token", err)
 	}
 
 	if expired {
@@ -142,41 +138,44 @@ func (a authenticationUseCase) GetUserByToken(
 
 func (a authenticationUseCase) AttemptCompleteRegistration(
 	ctx context.Context,
-	information *entities.AccountInformation,
-) (int64, error) {
+	information entities.AccountInformation,
+) error {
 	information.Username = strings.TrimSpace(information.Username)
 	information.Biography = strings.TrimSpace(information.Biography)
 
-	if !rules.ValidateName(information.Username) {
-		return 0, derr.InvalidUsername
+	var err error
+	if err = rules.ValidateName(information.Username); err != nil {
+		return err
 	}
 
-	if !rules.ValidateBiography(information.Biography) {
-		return 0, derr.InvalidBiography
+	if err = rules.ValidateBiography(information.Biography); err != nil {
+		return err
 	}
 
-	return a.repository.AttemptCompleteRegistration(ctx, *information)
+	err = a.repository.AttemptCompleteRegistration(ctx, information)
+	if err != nil {
+		return derr.JoinError("failed to complete registration", err)
+	}
+
+	return nil
 }
 
-func (a authenticationUseCase) RegisterProfileImage(
-	ctx context.Context,
+func (a authenticationUseCase) UploadProfileImage(
+	_ context.Context,
 	userID int64,
 	image []byte,
 ) error {
-	_, err := a.repository.GetUserByID(ctx, userID)
+	const profileFolderPath = "/user/profile"
+
+	err := a.storage.CreateAll(profileFolderPath)
 	if err != nil {
-		return derr.JoinInternalError(err, "failed to get user by id")
+		return derr.JoinError("failed to create user profile folder", err)
 	}
 
-	err = a.storage.CreateAll("/user/profile")
-	if err != nil {
-		return derr.JoinInternalError(err, "failed to create user profile folder")
-	}
-
-	path := filepath.Join("/user/profile", strconv.FormatInt(userID, 10))
+	path := filepath.Join(profileFolderPath, strconv.FormatInt(userID, 10))
 	err = a.storage.UploadFile(path, image)
 	if err != nil {
-		return derr.JoinInternalError(err, "failed to upload image")
+		return derr.JoinError("failed to upload image", err)
 	}
 
 	return nil

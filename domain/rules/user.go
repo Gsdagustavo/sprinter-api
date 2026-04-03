@@ -2,9 +2,12 @@ package rules
 
 import (
 	"net/mail"
+	"regexp"
+	"strings"
 	"unicode"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 )
 
 // Password rules
@@ -31,7 +34,7 @@ func ValidateEmail(email string) bool {
 	return err == nil && res.Address == email
 }
 
-func ValidatePassword(password string) bool {
+func ValidatePassword(password string) error {
 	var letters int
 	var number bool
 	var special bool
@@ -47,25 +50,51 @@ func ValidatePassword(password string) bool {
 		}
 	}
 
-	return letters >= PasswordMinLetters && letters <= PasswordMaxLetters && number && special
-}
-
-func ValidateName(name string) bool {
-	if len(name) < NameMinLetters || len(name) > NameMaxLetters {
-		return false
+	strong := letters >= PasswordMinLetters && letters <= PasswordMaxLetters && number && special
+	if !strong {
+		return derr.WeakPassword
 	}
 
-	return true
+	return nil
 }
 
-func ValidateBiography(biography string) bool {
+func ValidateName(name string) error {
+	if len(name) < NameMinLetters {
+		return derr.NameIsTooShort
+	}
+
+	if len(name) > NameMaxLetters {
+		return derr.NameIsTooLong
+	}
+
+	return nil
+}
+
+func ValidateBiography(biography string) error {
 	if len(biography) > BiographyMaxLetters {
-		return false
+		return derr.BiographyIsTooLong
 	}
 
-	return true
+	return nil
 }
 
-func ValidateCredentials(credentials entities.UserCredentials) bool {
-	return ValidateEmail(credentials.Email) && ValidatePassword(credentials.Password)
+func ValidateCredentials(credentials entities.UserCredentials) error {
+	if valid := ValidateEmail(credentials.Email); !valid {
+		return derr.InvalidEmail
+	}
+
+	if err := ValidatePassword(credentials.Password); err != nil {
+		return derr.WeakPassword
+	}
+
+	return nil
+}
+
+var toUsernameRegex = regexp.MustCompile(`[^a-zA-Z0-9]+`)
+
+func ToUsername(input string) string {
+	s := strings.ToLower(input)
+	s = toUsernameRegex.ReplaceAllString(s, "_")
+	s = strings.Trim(s, "_")
+	return s
 }
