@@ -3,15 +3,16 @@ module github.com/Gsdagustavo/sprinter-api
 go 1.26
 
 require (
-	github.com/BurntSushi/toml v1.6.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/handlers v1.5.2
 	github.com/gorilla/mux v1.8.1
 	github.com/kardianos/service v1.2.4
 	github.com/o1egl/paseto v1.0.0
+	github.com/takumakei/slogzap v1.0.0
 	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.48.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -21,11 +22,7 @@ require (
 	github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/pkg/errors v0.8.0 // indirect
-	github.com/samber/lo v1.53.0 // indirect
-	github.com/samber/slog-common v0.21.0 // indirect
-	github.com/samber/slog-zap/v2 v2.6.4 // indirect
-	github.com/takumakei/slogzap v1.0.0 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
 )

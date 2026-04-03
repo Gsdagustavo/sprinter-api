@@ -13,10 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BurntSushi/toml"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/kardianos/service"
+	"gopkg.in/yaml.v3"
 )
 
 func start() error {
@@ -99,7 +99,7 @@ func loadFlags() (string, string, bool) {
 	var terminal bool
 
 	// Try to read the configuration file from the command line arguments
-	flag.StringVar(&cfgPath, "configs", "settings/dev-settings.toml", "the path to the application config file")
+	flag.StringVar(&cfgPath, "configs", "settings/dev-settings.yaml", "the path to the application config file")
 	flag.StringVar(&action, "action", "run", "the action to execute")
 	flag.BoolVar(&terminal, "terminal", false, "display the logs in the terminal instead of in the log files")
 	flag.Parse()
@@ -159,7 +159,7 @@ func readCFGFile(cfgPath string) (*entities.Settings, error) {
 	}
 
 	var cfg entities.Settings
-	_, err = toml.Decode(string(bytes), &cfg)
+	err = yaml.Unmarshal(bytes, &cfg)
 	if err != nil {
 		return nil, derr.JoinError("failed to decode file", err)
 	}

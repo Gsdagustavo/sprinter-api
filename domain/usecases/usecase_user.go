@@ -12,7 +12,7 @@ import (
 
 func NewUserUseCases(
 	storage filestore.FileStorage,
-	storageConfig entities.StorageSettings,
+	storageConfig entities.FileStorageSettings,
 ) domain.UserUseCase {
 	return userUseCase{
 		storage:       storage,
@@ -22,7 +22,7 @@ func NewUserUseCases(
 
 type userUseCase struct {
 	storage       filestore.FileStorage
-	storageConfig entities.StorageSettings
+	storageConfig entities.FileStorageSettings
 }
 
 func (u userUseCase) SaveUserProfilePicture(

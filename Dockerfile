@@ -13,7 +13,7 @@ FROM scratch
 
 WORKDIR /app
 
-ENV CONFIGS_PATH=/app/settings/dev-settings.toml
+ENV CONFIGS_PATH=/app/settings/dev-settings.yml
 
 COPY --from=build /app/server .
 COPY --from=build /app/settings ./settings

@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BurntSushi/toml"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/kardianos/service"
+	"gopkg.in/yaml.v3"
 )
 
 func start() error {
@@ -107,7 +107,7 @@ func readCFGFile(cfgPath string) (*entities.Settings, error) {
 
 	var cfg entities.Settings
 
-	_, err = toml.Decode(string(b), &cfg)
+	err = yaml.Unmarshal(b, &cfg)
 	if err != nil {
 		return nil, derr.JoinError("failed to decode file", err)
 	}

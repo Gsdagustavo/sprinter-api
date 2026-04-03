@@ -1,15 +1,15 @@
 POST http://localhost:8000/api/auth/login
 
 {
-    "email": "gustavo@gmail.com",
-    "password": "Rg54757185#"
+    "email": "johndoe@example.com",
+    "password": "adcde12345#"
 }
 
 ###
 POST http://localhost:8000/api/auth/register
 
 {
-    "name": "Gustavo",
-    "email": "gustavos1@gmail.com",
-    "password": "RG547571856GADFE#"
+    "name": "John Doe",
+    "email": "johndoe@example.com",
+    "password": "adcde12345#"
 }
