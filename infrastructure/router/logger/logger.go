@@ -53,18 +53,20 @@ func GetLogValuesFromContext(ctx context.Context) []slog.Attr {
 }
 
 // CreateLogHandler creates a properly configured slog.Handler using structured logging and the Zap library
-func CreateLogHandler(outPath string, environmentType entities.EnvironmentType) (slog.Handler, error) {
+func CreateLogHandler(outPath string, settings entities.Settings) (slog.Handler, error) {
 	// Customize the logger according to the environment where the server is running
-	switch environmentType {
-	case entities.Production:
+	switch {
+	case settings.IsProduction():
 		zapLoggerConfig := zap.NewProductionConfig()
 		if outPath != "" {
 			zapLoggerConfig.OutputPaths = []string{outPath}
 		}
+
 		zapLogger, err := zapLoggerConfig.Build()
 		if err != nil {
 			return nil, errors.Join(errors.New("failed to build production logger"), err)
 		}
+
 		zapOptions := slogzap.Option{
 			Level:     slog.LevelInfo,
 			Logger:    zapLogger,
@@ -73,15 +75,31 @@ func CreateLogHandler(outPath string, environmentType entities.EnvironmentType) 
 				GetLogValuesFromContext,
 			},
 		}
+
 		return zapOptions.NewZapHandler(), nil
+	case settings.IsLocal():
+		consoleEncoderConfig := zap.NewDevelopmentEncoderConfig()
+		consoleEncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		consoleEncoder := zapcore.NewConsoleEncoder(consoleEncoderConfig)
 
-	case entities.Development:
-		encoderConfig := zap.NewDevelopmentEncoderConfig()
-		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-		encoder := zapcore.NewConsoleEncoder(encoderConfig)
+		fileEncoderConfig := zap.NewDevelopmentEncoderConfig()
+		fileEncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+		fileEncoder := zapcore.NewConsoleEncoder(fileEncoderConfig)
 
-		core := zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel)
-		zapLogger := zap.New(core, zap.AddCaller())
+		cores := []zapcore.Core{
+			zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
+		}
+
+		if outPath != "" {
+			f, err := os.OpenFile(outPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			if err != nil {
+				return nil, fmt.Errorf("failed to open log file: %w", err)
+			}
+
+			cores = append(cores, zapcore.NewCore(fileEncoder, zapcore.AddSync(f), zapcore.DebugLevel))
+		}
+
+		zapLogger := zap.New(zapcore.NewTee(cores...), zap.AddCaller())
 
 		zapOptions := slogzap.Option{
 			Level:     slog.LevelDebug,
@@ -91,18 +109,33 @@ func CreateLogHandler(outPath string, environmentType entities.EnvironmentType) 
 				GetLogValuesFromContext,
 			},
 		}
+
 		return zapOptions.NewZapHandler(), nil
 
 	default:
-		return nil, errors.New("unknown environment: " + string(environmentType))
+		return nil, errors.New("unknown environment: " + string(settings.EnvironmentSettings.EnvironmentType))
 	}
 }
 
 func SetupLogger(settings entities.Settings) error {
-	serverLogs, _ := selectLogOutput(settings)
+	serverLogs, httpLogs := selectLogOutput(settings)
+
+	if serverLogs != "" {
+		err := os.MkdirAll(filepath.Dir(serverLogs), 0755)
+		if err != nil {
+			return errors.Join(errors.New("failed to create log dir"), err)
+		}
+	}
+
+	if httpLogs != "" {
+		err := os.MkdirAll(filepath.Dir(httpLogs), 0755)
+		if err != nil {
+			return errors.Join(errors.New("failed to create http log dir"), err)
+		}
+	}
 
 	// Initialize the log handler
-	logHandler, err := CreateLogHandler(serverLogs, settings.EnvironmentSettings.EnvironmentType)
+	logHandler, err := CreateLogHandler(serverLogs, settings)
 	if err != nil {
 		return errors.Join(errors.New("failed to create log handler"), err)
 	}

@@ -21,6 +21,9 @@ import (
 
 func Start() error {
 	settings, err := loadSettingsFromEnv()
+	if err != nil {
+		return errors.Join(errors.New("failed to load settings from environment variables"), err)
+	}
 
 	// Order the modules
 	router := mux.NewRouter()

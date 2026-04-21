@@ -15,14 +15,12 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 			slog.InfoContext(ctx, "request received",
 				slog.String("method", r.Method),
 				slog.String("url", r.URL.String()),
-				slog.String("host", r.Host),
 			)
 		} else {
 			slog.InfoContext(ctx, "request received",
 				slog.String("method", r.Method),
 				slog.String("url", r.URL.String()),
-				slog.String("host", r.Host),
-				slog.Any("userID", user.ID),
+				slog.Any("user_id", user.ID),
 			)
 		}
 
