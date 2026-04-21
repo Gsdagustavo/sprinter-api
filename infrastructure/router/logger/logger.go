@@ -1,31 +1,133 @@
 package logger
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
+	"time"
 
-	"github.com/takumakei/slogzap"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	slogzap "github.com/samber/slog-zap/v2"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-func InitLogger() {
-	encoderConfig := zap.NewDevelopmentEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	encoderConfig.EncodeCaller = zapcore.FullCallerEncoder
+type ctxKey string
 
-	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(encoderConfig),
-		zapcore.AddSync(os.Stdout),
-		zap.DebugLevel,
-	)
+const (
+	slogFields      ctxKey = "slog_fields"
+	logNameTemplate        = "20060102"
+)
 
-	zapLogger := zap.New(core, zap.AddCaller())
-	handler := slogzap.New(zapLogger)
-	slog.SetDefault(slog.New(handler))
+// AddLogValueToContext adds a slog attribute to the provided context so that it will be
+// included in any Record created with such context
+func AddLogValueToContext(parent context.Context, attr ...slog.Attr) context.Context {
+	if parent == nil {
+		parent = context.Background()
+	}
+
+	if v, ok := parent.Value(slogFields).([]slog.Attr); ok {
+		for _, i := range attr {
+			v = append(v, i)
+		}
+		return context.WithValue(parent, slogFields, v)
+	}
+
+	var v []slog.Attr
+	for _, i := range attr {
+		v = append(v, i)
+	}
+	return context.WithValue(parent, slogFields, v)
 }
 
+// GetLogValuesFromContext retrieves the slice with all log values added to ctx using AddLogValueToContext
+func GetLogValuesFromContext(ctx context.Context) []slog.Attr {
+	attrs, ok := ctx.Value(slogFields).([]slog.Attr)
+	if ok {
+		return attrs
+	}
+	return nil
+}
+
+// CreateLogHandler creates a properly configured slog.Handler using structured logging and the Zap library
+func CreateLogHandler(outPath string, environmentType entities.EnvironmentType) (slog.Handler, error) {
+	// Customize the logger according to the environment where the server is running
+	switch environmentType {
+	case entities.Production:
+		zapLoggerConfig := zap.NewProductionConfig()
+		if outPath != "" {
+			zapLoggerConfig.OutputPaths = []string{outPath}
+		}
+		zapLogger, err := zapLoggerConfig.Build()
+		if err != nil {
+			return nil, errors.Join(errors.New("failed to build production logger"), err)
+		}
+		zapOptions := slogzap.Option{
+			Level:     slog.LevelInfo,
+			Logger:    zapLogger,
+			AddSource: true,
+			AttrFromContext: []func(ctx context.Context) []slog.Attr{
+				GetLogValuesFromContext,
+			},
+		}
+		return zapOptions.NewZapHandler(), nil
+
+	case entities.Development:
+		encoderConfig := zap.NewDevelopmentEncoderConfig()
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		encoder := zapcore.NewConsoleEncoder(encoderConfig)
+
+		core := zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel)
+		zapLogger := zap.New(core, zap.AddCaller())
+
+		zapOptions := slogzap.Option{
+			Level:     slog.LevelDebug,
+			Logger:    zapLogger,
+			AddSource: true,
+			AttrFromContext: []func(ctx context.Context) []slog.Attr{
+				GetLogValuesFromContext,
+			},
+		}
+		return zapOptions.NewZapHandler(), nil
+
+	default:
+		return nil, errors.New("unknown environment: " + string(environmentType))
+	}
+}
+
+func SetupLogger(settings entities.Settings) error {
+	serverLogs, _ := selectLogOutput(settings)
+
+	// Initialize the log handler
+	logHandler, err := CreateLogHandler(serverLogs, settings.EnvironmentSettings.EnvironmentType)
+	if err != nil {
+		return errors.Join(errors.New("failed to create log handler"), err)
+	}
+
+	// Wrap with the context handler to always process the context variables in the log.
+	slog.SetDefault(slog.New(logHandler))
+
+	return nil
+}
+
+// Returns the path to the application and middleware log files, and whether the log file rotation should be enabled
+func selectLogOutput(settings entities.Settings) (string, string) {
+	logDir := settings.LogSettings.LogDir
+	if logDir == "" {
+		return "", ""
+	}
+
+	formattedDate := time.Now().Format(logNameTemplate)
+	applicationLog := filepath.Join(logDir, fmt.Sprintf("%s.log", formattedDate))
+	middlewareLog := filepath.Join(logDir, fmt.Sprintf("%s-http.log", formattedDate))
+
+	return applicationLog, middlewareLog
+}
+
+// Err returns an Attr for an error value
 func Err(err error) slog.Attr {
 	if err == nil {
 		return slog.Attr{

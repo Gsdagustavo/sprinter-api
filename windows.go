@@ -3,199 +3,105 @@
 package main
 
 import (
+	_ "embed"
 	"errors"
 	"flag"
-	"fmt"
-	"io"
-	"log"
 	"log/slog"
 	"os"
-	"strings"
-	"time"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
-	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
-	"github.com/kardianos/service"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
+	"github.com/Gsdagustavo/sprinter-api/service"
 	"gopkg.in/yaml.v3"
 )
 
-func start() error {
-	configsPath, action, terminal := loadFlags()
-	cfg, err := readCFGFile(configsPath)
+func Start() error {
+	// Read the settings file
+	cggPath, action := loadFlags()
+
+	// Load the settings path
+	if cggPath == "" {
+		return errors.New("settings path is empty")
+	}
+
+	configsFile, err := os.Open(cggPath)
 	if err != nil {
-		return derr.JoinError("failed to read config file", err)
+		return errors.Join(errors.New("failed to open configs file"), err)
 	}
+	defer configsFile.Close()
 
-	if !terminal {
-		file, err := configureOutput(cfg.LogSettings.LogDir)
-		if err != nil {
-			return derr.JoinError("failed to configure log outputs", err)
-		}
-		defer file.Close()
-	}
-
-	s, err := newService(*cfg)
+	var settings entities.Settings
+	err = yaml.NewDecoder(configsFile).Decode(&settings)
 	if err != nil {
-		return derr.JoinError("failed to create service", err)
+		return errors.Join(errors.New("failed to decode configs file"), err)
 	}
 
-	if strings.TrimSpace(action) == "" {
-		return errors.New("action not provided")
+	err = logger.SetupLogger(settings)
+	if err != nil {
+		return errors.Join(errors.New("failed to setup logger"), err)
+	}
+
+	s, err := service.NewService(settings, cggPath)
+	if err != nil {
+		return errors.Join(errors.New("failed to create service"), err)
 	}
 
 	switch action {
-	case "run":
-		slog.Info("run service")
+	case "run", "":
+		slog.Info("Run service")
 
 		err = s.Run()
 		if err != nil {
-			return derr.JoinError("failed to run service", err)
+			return errors.Join(errors.New("failed to run service"), err)
 		}
+
+		return nil
+
 	case "uninstall":
-		slog.Info("uninstalling service")
+		slog.Info("Uninstall service")
 
 		err = s.Uninstall()
 		if err != nil {
-			return derr.JoinError("failed to uninstall service", err)
+			return errors.Join(errors.New("failed to uninstall service"), err)
 		}
+
 	case "install":
-		slog.Info("install service")
+		slog.Info("Install service")
 
 		err = s.Install()
 		if err != nil {
-			return derr.JoinError("failed to install service", err)
+			return errors.Join(errors.New("failed to install service"), err)
 		}
+
 	case "stop":
-		log.Println("stopping service")
+		slog.Info("Stop service")
 
 		err = s.Stop()
 		if err != nil {
-			return derr.JoinError("failed to stop service", err)
+			return errors.Join(errors.New("failed to stop service"), err)
 		}
 	}
 
 	return nil
 }
 
-func (p *program) Start(s service.Service) error {
-	slog.Info("received call to program#start")
-
-	// Start should not block. Do the actual work async.
-	go p.run(false)
-
-	return nil
-}
-
-func (p *program) Stop(s service.Service) error {
-	slog.Info("received call to program#stop")
-
-	// Stop should not block. Return with a few seconds
-	return nil
-}
-
-func loadFlags() (string, string, bool) {
+func loadFlags() (string, string) {
 	var cfgPath string
 	var action string
-	var terminal bool
 
 	// Try to read the configuration file from the command line arguments
-	flag.StringVar(&cfgPath, "configs", "settings/dev-settings.yaml", "the path to the application config file")
-	flag.StringVar(&action, "action", "run", "the action to execute")
-	flag.BoolVar(&terminal, "terminal", false, "display the logs in the terminal instead of in the log files")
+	flag.StringVar(&cfgPath, "configs", "", "the path to the application config file")
+	flag.StringVar(&action, "action", "", "the action to execute")
 	flag.Parse()
 
-	// If not provided as argument, read from the environment
+	// If not provided as an argument, read from the environment
 	if cfgPath == "" {
 		cfgPath = os.Getenv("configs")
 	}
 
-	// And panic if the argument was not found
 	if cfgPath == "" {
-		panic("[configs] argument not found")
+		return "", ""
 	}
 
-	return cfgPath, action, terminal
-}
-
-func configureOutput(logFolder string) (*os.File, error) {
-	if logFolder == "" {
-		return nil, nil
-	}
-
-	now := time.Now()
-	logName := fmt.Sprintf("%s/%s.log", logFolder, now.Format("20060102150405"))
-
-	err := os.MkdirAll(logFolder, os.ModePerm)
-	if err != nil {
-		return nil, derr.JoinError("failed to create log folder", err)
-	}
-
-	file, err := os.OpenFile(logName, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
-	if err != nil {
-		if os.IsNotExist(err) {
-			err = os.WriteFile(logName, []byte(""), os.ModePerm)
-			if err != nil {
-				return nil, derr.JoinError("failed to write to file", err)
-			}
-		}
-
-		return nil, derr.JoinError("failed to open log file", err)
-	}
-
-	log.SetOutput(io.MultiWriter(os.Stdout, file))
-	return file, nil
-}
-
-func readCFGFile(cfgPath string) (*entities.Settings, error) {
-	file, err := os.Open(cfgPath)
-	if err != nil {
-		return nil, derr.JoinError("failed to open file", err)
-	}
-	defer file.Close()
-
-	bytes, err := io.ReadAll(file)
-	if err != nil {
-		return nil, derr.JoinError("failed to read file", err)
-	}
-
-	var cfg entities.Settings
-	err = yaml.Unmarshal(bytes, &cfg)
-	if err != nil {
-		return nil, derr.JoinError("failed to decode file", err)
-	}
-
-	return &cfg, nil
-}
-
-func newService(cfg entities.Settings) (service.Service, error) {
-	slog.Info("creating service")
-
-	// Load the received arguments
-	var args []string
-
-	// Clean the executable arguments
-	if len(os.Args) > 1 {
-		for _, arg := range os.Args {
-			if strings.Contains(arg, "configs") {
-				args = append(args, arg)
-			}
-		}
-	}
-
-	svcConfig := &service.Config{
-		Name:        "sprinter",
-		DisplayName: "Sprinter API",
-		Arguments:   args,
-	}
-
-	p := &program{
-		cfg: cfg,
-	}
-
-	s, err := service.New(p, svcConfig)
-	if err != nil {
-		return nil, derr.JoinError("failed to create service", err)
-	}
-
-	return s, nil
+	return cfgPath, action
 }

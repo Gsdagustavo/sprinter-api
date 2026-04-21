@@ -37,10 +37,15 @@ func SetupModules(r *mux.Router, config entities.Settings) error {
 	authModule := modules.NewAuthModule(authUseCases)
 	productModule := modules.NewProductModule(productUseCases)
 
-	apiSubRouter := r.PathPrefix("/api").Subrouter()
+	modules := []router.Module{
+		authModule,
+		productModule,
+	}
 
-	_, _ = authModule.Setup(apiSubRouter)
-	_, _ = productModule.Setup(apiSubRouter)
+	apiSubRouter := r.PathPrefix("/api").Subrouter()
+	for _, module := range modules {
+		module.Setup(apiSubRouter)
+	}
 
 	r.Use(router.LoggingMiddleware)
 

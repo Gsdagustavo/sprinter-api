@@ -3,6 +3,11 @@ ServerSettings:
   Host: "localhost"
   Domain: "http://localhost:8000"
 
+ServiceConfig:
+  Name: "sprinter_server"
+  Display: "Sprinter Web Service"
+  Description: "Sprinter Web Service"
+
 RepositorySettings:
   Host: localhost
   Port: 3306
@@ -19,12 +24,19 @@ LogSettings:
 PasetoSettings:
   PasetoSecurityKey: "b7e16bf2-ab0f-4a68-a16b-f2ab0f6a"
 
+CORSConfig:
+  CORSOrigins:
+    - "localhost:8000"
+
 FileStorageSettings:
   StorageFolder: "./runtime/storage"
 
-SMPTSettings:
-  Host: ""
-  Port: ""
-  User: ""
-  Password: ""
-  From: ""
+SMTPSettings:
+  Host: "localhost"
+  Port: 1025
+  User: "test"
+  Password: "test"
+  From: "dev@test.com"
+  MaxConnections: 5
+  IdleTimeout: 30s
+  PoolWaitTimeout: 10s

@@ -1,5 +1,7 @@
 package entities
 
+import "time"
+
 // EnvironmentType represents the type of environment
 type EnvironmentType string
 
@@ -19,6 +21,9 @@ type Settings struct {
 	// RepositorySettings is the settings for database connection
 	RepositorySettings RepositorySettings `yaml:"RepositorySettings"`
 
+	// ServiceConfig represents a service with its name, display name, and description configuration
+	ServiceConfig ServiceConfig `yaml:"ServiceConfig"`
+
 	// Environment is the settings used to handle environment
 	EnvironmentSettings EnvironmentSettings `yaml:"EnvironmentSettings"`
 
@@ -28,11 +33,26 @@ type Settings struct {
 	// PasetoSettings is the settings for data for encryption
 	PasetoSettings PasetoSettings `yaml:"PasetoSettings"`
 
+	// CORSConfig defines the configuration for Cross-Origin Resource Sharing (CORS) settings
+	CORSConfig CORSConfig `json:"corsConfig" toml:"CORSConfig"`
+
 	// FileStorage is the settings related to file storage
 	FileStorageSettings FileStorageSettings `yaml:"FileStorageSettings"`
 
-	// SMPTSettings is the for the SMTP server connection
-	SMPTSettings SMPTSettings `yaml:"SMPTSettings"`
+	// SMTPSettings is the for the SMTP server connection
+	SMTPSettings SMTPSettings `yaml:"SMTPSettings"`
+}
+
+// ServiceConfig stores the name, display name, and description of a service
+type ServiceConfig struct {
+	// Name is the name of the service
+	Name string `yaml:"Name"`
+
+	// Display is the display name of the service
+	Display string `yaml:"Display"`
+
+	// Description is the description of the service
+	Description string `yaml:"Description"`
 }
 
 // LogSettings is the settings used to handle logs
@@ -42,13 +62,13 @@ type LogSettings struct {
 }
 
 // IsProduction returns true if the application is running in a production environment
-func (c Settings) IsProduction() bool {
-	return c.EnvironmentSettings.EnvironmentType == Production
+func (s Settings) IsProduction() bool {
+	return s.EnvironmentSettings.EnvironmentType == Production
 }
 
 // IsLocal returns true if the application is running in the local environment
-func (c Settings) IsLocal() bool {
-	return c.EnvironmentSettings.EnvironmentType == Development
+func (s Settings) IsLocal() bool {
+	return s.EnvironmentSettings.EnvironmentType == Development
 }
 
 // ServerSettings represents the configuration for a server
@@ -93,19 +113,25 @@ type PasetoSettings struct {
 	SecurityKey string `yaml:"PasetoSecurityKey"`
 }
 
+// CORSConfig stores CORS-related configuration
+type CORSConfig struct {
+	// CORSOrigins is a list of allowed origins for CORS requests
+	CORSOrigins []string `yaml:"CORSOrigins"`
+}
+
 // FileStorageSettings represents the configuration for storing files.
 type FileStorageSettings struct {
 	// StorageFolder is the folder for storing files
 	StorageFolder string `yaml:"StorageFolder"`
 }
 
-// SMPTSettings represents the configuration for connecting to an SMTP server
-type SMPTSettings struct {
+// SMTPSettings represents the configuration for connecting to an SMTP server
+type SMTPSettings struct {
 	// Host specifies the hostname or IP address of the SMTP server
 	Host string `yaml:"Host"`
 
 	// Port specifies the port number for the SMTP server connection
-	Port string `yaml:"Port"`
+	Port int `yaml:"Port"`
 
 	// User specifies the username for authentication with the SMTP server
 	User string `yaml:"User"`
@@ -115,9 +141,17 @@ type SMPTSettings struct {
 
 	// From specifies the sender's email address for the SMTP server
 	From string `yaml:"From"`
-}
 
-// Addr returns the SMTP server address in the format "host:port"
-func (s *SMPTSettings) Addr() string {
-	return s.Host + ":" + s.Port
+	// MaxConnections specifies the maximum number of connections in the email connection pool
+	MaxConnections int `yaml:"MaxConnections"`
+
+	// IdleTimeout is the maximum time to wait for new activity on a connection
+	// before closing it and removing it from the pool.
+	IdleTimeout time.Duration `yaml:"IdleTimeout"`
+
+	// PoolWaitTimeout is the maximum time to wait to obtain a connection from
+	// a pool before timing out. This may happen when all open connections are
+	// busy sending e-mails, and they're not returning to the pool fast enough.
+	// This is also the timeout used when creating new SMTP connections.
+	PoolWaitTimeout time.Duration `yaml:"PoolWaitTimeout"`
 }
