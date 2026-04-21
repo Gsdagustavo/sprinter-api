@@ -14,6 +14,7 @@ import (
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
