@@ -31,8 +31,8 @@ type Settings struct {
 	// FileStorage is the settings related to file storage
 	FileStorageSettings FileStorageSettings `yaml:"FileStorageSettings"`
 
-	// SMPTSettings is the for the SMTP server connection
-	SMPTSettings SMPTSettings `yaml:"SMPTSettings"`
+	// SMTPSettings is the for the SMTP server connection
+	SMTPSettings SMTPSettings `yaml:"SMTPSettings"`
 }
 
 // LogSettings is the settings used to handle logs
@@ -99,8 +99,8 @@ type FileStorageSettings struct {
 	StorageFolder string `yaml:"StorageFolder"`
 }
 
-// SMPTSettings represents the configuration for connecting to an SMTP server
-type SMPTSettings struct {
+// SMTPSettings represents the configuration for connecting to an SMTP server
+type SMTPSettings struct {
 	// Host specifies the hostname or IP address of the SMTP server
 	Host string `yaml:"Host"`
 
@@ -118,6 +118,6 @@ type SMPTSettings struct {
 }
 
 // Addr returns the SMTP server address in the format "host:port"
-func (s *SMPTSettings) Addr() string {
+func (s *SMTPSettings) Addr() string {
 	return s.Host + ":" + s.Port
 }

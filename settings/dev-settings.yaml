@@ -22,7 +22,7 @@ PasetoSettings:
 FileStorageSettings:
   StorageFolder: "./runtime/storage"
 
-SMPTSettings:
+SMTPSettings:
   Host: ""
   Port: ""
   User: ""
