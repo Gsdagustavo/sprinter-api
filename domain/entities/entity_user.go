@@ -60,3 +60,12 @@ type AccountInformation struct {
 	// ImageURL is the url for the user's profile picture
 	ImageURL string `json:"image_url,omitempty"`
 }
+type EditUserProfileDTO struct {
+	// ID is the unique identifier for the user
+	ID int64
+	// Username is the name identifier for the user
+	Username string `json:"username,omitempty"`
+
+	// Biography is the description for the user
+	Biography string `json:"biography,omitempty"`
+}

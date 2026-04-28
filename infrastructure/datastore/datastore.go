@@ -53,6 +53,15 @@ type AuthRepository interface {
 	) error
 }
 
+// UserRepository define methods for managing user data
+type UserRepository interface {
+	// Edit the user profile
+	EditUserProfile(
+		ctx context.Context,
+		editIt entities.EditUserProfileDTO,
+	) error
+}
+
 // ProductRepository defines methods for managing product data.
 type ProductRepository interface {
 	// AddNewProduct is trying to add a new product
