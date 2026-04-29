@@ -57,7 +57,7 @@ type UserUseCase interface {
 		userID int64,
 		image []byte,
 	) (string, error)
-	EditUserProfile(ctx context.Context, editedUser entities.EditUserProfileDTO) (string, error)
+	EditUserProfile(ctx context.Context, editedUser entities.EditUserProfileDTO) (*entities.User, error)
 }
 
 // ProductUseCase defines a use case interface with methods related to product managing
