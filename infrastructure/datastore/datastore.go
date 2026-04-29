@@ -58,8 +58,11 @@ type UserRepository interface {
 	// Edit the user profile
 	EditUserProfile(
 		ctx context.Context,
-		editIt entities.EditUserProfileDTO,
-	) (*entities.User, error)
+		editIt entities.AccountInformation,
+	) error
+
+	// Get the user by id
+	GetUserById(ctx context.Context, id int64) (*entities.User, error)
 }
 
 // ProductRepository defines methods for managing product data.

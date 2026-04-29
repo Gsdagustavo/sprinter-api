@@ -31,17 +31,27 @@ type userUseCase struct {
 	userRepo      datastore.UserRepository
 }
 
-func (u userUseCase) EditUserProfile(ctx context.Context, editedUser entities.EditUserProfileDTO) (*entities.User, error) {
-	if err := rules.ValidateName(editedUser.Username); err != nil {
-		return nil, err
-	}
-	if err := rules.ValidateBiography(editedUser.Biography); err != nil {
-		return nil, err
-	}
-	user, err := u.userRepo.EditUserProfile(ctx, editedUser)
+func (u userUseCase) EditUserProfile(ctx context.Context, userInformation entities.AccountInformation) (*entities.User, error) {
+	err := rules.ValidateName(userInformation.Username)
 	if err != nil {
 		return nil, err
 	}
+
+	err = rules.ValidateBiography(userInformation.Biography)
+	if err != nil {
+		return nil, err
+	}
+
+	err = u.userRepo.EditUserProfile(ctx, userInformation)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := u.userRepo.GetUserById(ctx, userInformation.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return user, nil
 }
 
