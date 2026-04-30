@@ -77,20 +77,12 @@ func (m userModule) editUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userInformation.ID = user.ID
-	updatedUser, err := m.userUseCases.UpdateUserProfile(ctx, userInformation)
+	response, err := m.userUseCases.UpdateUserProfile(ctx, userInformation)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to edit user", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}
-
-	response, err := json.Marshal(updatedUser)
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to marshal the response body", logger.Err(err))
-		router.HandleError(w, err)
-		return
-	}
-
 	err = router.Write(w, response)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
