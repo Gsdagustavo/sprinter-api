@@ -57,7 +57,11 @@ type UserUseCase interface {
 		userID int64,
 		image []byte,
 	) (string, error)
-	UpdateUserProfile(ctx context.Context, userInformation entities.AccountInformation) (*entities.User, error)
+	// UpdateUserProfile update the user profile from a user with the given information
+	UpdateUserProfile(
+		ctx context.Context,
+		userInformation entities.AccountInformation,
+	) (*entities.User, error)
 }
 
 // ProductUseCase defines a use case interface with methods related to product managing
