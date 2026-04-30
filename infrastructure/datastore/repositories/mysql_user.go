@@ -23,9 +23,9 @@ type userRepository struct {
 	settings datastore.RepositorySettings
 }
 
-func (ur *userRepository) EditUserProfile(
+func (r *userRepository) UpdateUserProfile(
 	ctx context.Context,
-	editIt entities.AccountInformation,
+	accountInformation entities.AccountInformation,
 ) error {
 	const query = `
 	UPDATE users
@@ -34,22 +34,19 @@ func (ur *userRepository) EditUserProfile(
 	WHERE id = ?
 	`
 
-	result, err := ur.conn.ExecContext(ctx, query, &editIt.Username, &editIt.Biography, &editIt.ID)
+	result, err := r.conn.ExecContext(ctx, query, &accountInformation.Username, &accountInformation.Biography, &accountInformation.ID)
 	if err != nil {
 		return derr.JoinError("failed to execute query", err)
 	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return derr.JoinError("failed to get rows affected", err)
-	}
 
+	rowsAffected, err := result.RowsAffected()
 	if rowsAffected == 0 {
 		return derr.NotFoundError
 	}
 
 	return nil
 }
-func (ur *userRepository) GetUserById(ctx context.Context, id int64) (*entities.User, error) {
+func (r *userRepository) GetUserById(ctx context.Context, id int64) (*entities.User, error) {
 	const query = `
 	SELECT 
     	id, 
@@ -62,7 +59,7 @@ func (ur *userRepository) GetUserById(ctx context.Context, id int64) (*entities.
 	`
 
 	var user entities.User
-	row := ur.conn.QueryRowContext(ctx, query, id)
+	row := r.conn.QueryRowContext(ctx, query, id)
 	err := row.Scan(
 		&user.ID,
 		&user.Name,
@@ -71,8 +68,14 @@ func (ur *userRepository) GetUserById(ctx context.Context, id int64) (*entities.
 		&user.Carbon,
 		&user.TraveledDistance,
 	)
+
+	if err == sql.ErrNoRows {
+		return nil, derr.JoinError("user does not exists", err)
+	}
+
 	if err != nil {
 		return nil, derr.JoinError("failed to scan the rows", err)
 	}
+
 	return &user, nil
 }

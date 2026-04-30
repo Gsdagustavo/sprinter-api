@@ -55,13 +55,13 @@ type AuthRepository interface {
 
 // UserRepository define methods for managing user data
 type UserRepository interface {
-	// Edit the user profile
-	EditUserProfile(
+	// UpdateUserProfile attempts to edit an user profile with the given information
+	UpdateUserProfile(
 		ctx context.Context,
-		editIt entities.AccountInformation,
+		accountInformation entities.AccountInformation,
 	) error
 
-	// Get the user by id
+	// GetUserById attempts to get the user from the given user id
 	GetUserById(ctx context.Context, id int64) (*entities.User, error)
 }
 

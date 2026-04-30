@@ -31,25 +31,19 @@ type userUseCase struct {
 	userRepo      datastore.UserRepository
 }
 
-func (u userUseCase) EditUserProfile(ctx context.Context, userInformation entities.AccountInformation) (*entities.User, error) {
-	err := rules.ValidateName(userInformation.Username)
+func (u userUseCase) UpdateUserProfile(ctx context.Context, userInformation entities.AccountInformation) (*entities.User, error) {
+	err := rules.ValidateUserInformation(userInformation)
 	if err != nil {
-		return nil, err
+		return nil, derr.JoinError("failed to validate the user information ", err)
 	}
-
-	err = rules.ValidateBiography(userInformation.Biography)
+	err = u.userRepo.UpdateUserProfile(ctx, userInformation)
 	if err != nil {
-		return nil, err
-	}
-
-	err = u.userRepo.EditUserProfile(ctx, userInformation)
-	if err != nil {
-		return nil, err
+		return nil, derr.JoinError("failed to update the user profile ", err)
 	}
 
 	user, err := u.userRepo.GetUserById(ctx, userInformation.ID)
 	if err != nil {
-		return nil, err
+		return nil, derr.JoinError("failed to get the updated user ", err)
 	}
 
 	return user, nil

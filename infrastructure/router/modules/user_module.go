@@ -19,26 +19,26 @@ type userModule struct {
 	path         string
 }
 
-func (u userModule) Name() string {
-	return u.name
+func (m userModule) Name() string {
+	return m.name
 }
 
-func (u userModule) Path() string {
-	return u.path
+func (m userModule) Path() string {
+	return m.path
 }
 
-func (u userModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router) {
+func (m userModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router) {
 	defs := []router.RouteDefinition{
 		{
 			Path:        "/{userID}",
 			Description: "Edit user profile",
-			Handler:     u.editUser,
+			Handler:     m.editUser,
 			HttpMethods: []string{http.MethodPut},
 		},
 	}
 
 	for _, d := range defs {
-		r.HandleFunc(u.path+d.Path, d.Handler).Methods(d.HttpMethods...)
+		r.HandleFunc(m.path+d.Path, d.Handler).Methods(d.HttpMethods...)
 	}
 
 	return defs, r
@@ -52,7 +52,7 @@ func NewUserModule(userUsecase domain.UserUseCase) router.Module {
 	}
 }
 
-func (u userModule) editUser(w http.ResponseWriter, r *http.Request) {
+func (m userModule) editUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, err := router.GetUser(r)
 	if err != nil {
@@ -77,7 +77,7 @@ func (u userModule) editUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userInformation.ID = user.ID
-	response, err := u.userUseCases.EditUserProfile(ctx, userInformation)
+	response, err := m.userUseCases.UpdateUserProfile(ctx, userInformation)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to edit user", logger.Err(err))
 		router.HandleError(w, err)

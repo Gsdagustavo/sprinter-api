@@ -29,6 +29,19 @@ const (
 	BiographyMaxLetters = 100
 )
 
+func ValidateUserInformation(userInformation entities.AccountInformation) error {
+	err := ValidateName(userInformation.Username)
+	if err != nil {
+		return err
+	}
+
+	err = ValidateBiography(userInformation.Biography)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 func ValidateEmail(email string) bool {
 	res, err := mail.ParseAddress(email)
 	return err == nil && res.Address == email
