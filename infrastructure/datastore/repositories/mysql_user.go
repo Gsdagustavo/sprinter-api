@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
@@ -34,14 +35,9 @@ func (r *userRepository) UpdateUserProfile(
 	WHERE id = ?
 	`
 
-	result, err := r.conn.ExecContext(ctx, query, &accountInformation.Username, &accountInformation.Biography, &accountInformation.ID)
+	_, err := r.conn.ExecContext(ctx, query, &accountInformation.Username, &accountInformation.Biography, &accountInformation.ID)
 	if err != nil {
 		return derr.JoinError("failed to execute query", err)
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if rowsAffected == 0 {
-		return derr.NotFoundError
 	}
 
 	return nil
@@ -69,11 +65,12 @@ func (r *userRepository) GetUserById(ctx context.Context, id int64) (*entities.U
 		&user.TraveledDistance,
 	)
 
-	if err == sql.ErrNoRows {
-		return nil, derr.JoinError("user does not exists", err)
-	}
-
 	if err != nil {
+
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, derr.NotFoundError
+		}
+
 		return nil, derr.JoinError("failed to scan the rows", err)
 	}
 

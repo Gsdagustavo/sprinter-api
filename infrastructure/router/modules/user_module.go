@@ -30,7 +30,7 @@ func (m userModule) Path() string {
 func (m userModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router) {
 	defs := []router.RouteDefinition{
 		{
-			Path:        "/{userID}",
+			Path:        "",
 			Description: "Edit user profile",
 			Handler:     m.editUser,
 			HttpMethods: []string{http.MethodPut},
@@ -77,9 +77,16 @@ func (m userModule) editUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userInformation.ID = user.ID
-	response, err := m.userUseCases.UpdateUserProfile(ctx, userInformation)
+	updatedUser, err := m.userUseCases.UpdateUserProfile(ctx, userInformation)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to edit user", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	response, err := json.Marshal(updatedUser)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to marshal the response body", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}

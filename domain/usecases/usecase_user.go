@@ -34,8 +34,9 @@ type userUseCase struct {
 func (u userUseCase) UpdateUserProfile(ctx context.Context, userInformation entities.AccountInformation) (*entities.User, error) {
 	err := rules.ValidateUserInformation(userInformation)
 	if err != nil {
-		return nil, derr.JoinError("failed to validate the user information ", err)
+		return nil, err
 	}
+
 	err = u.userRepo.UpdateUserProfile(ctx, userInformation)
 	if err != nil {
 		return nil, derr.JoinError("failed to update the user profile ", err)
