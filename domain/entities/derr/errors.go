@@ -28,3 +28,7 @@ var (
 	InvalidProductStock       = NewClientError("INVALID_PRODUCT_STOCK", "Invalid product stock")
 	InvalidProductDiscount    = NewClientError("INVALID_PRODUCT_DISCOUNT", "Invalid product discount")
 )
+var (
+	InvalidActivityType     = NewClientError("INVALID_ACTIVITY_TYPE", "Invalid activity type")
+	InvalidActivityDuration = NewClientError("INVALID_ACTIVITY_DURATION", "Invalid activity duration")
+)

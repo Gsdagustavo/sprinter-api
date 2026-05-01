@@ -22,8 +22,8 @@ type activityRepository struct {
 }
 
 func (r activityRepository) AddNewActivity(
-		ctx context.Context,
-		activity entities.Activity,
+	ctx context.Context,
+	activity entities.Activity,
 ) (int64, error) {
 	const query = `
 INSERT INTO activities (
