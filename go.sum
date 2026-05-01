@@ -22,6 +22,8 @@ github.com/kardianos/service v1.2.4 h1:XNlGtZOYNx2u91urOdg/Kfmc+gfmuIo1Dd3rEi2Og
 github.com/kardianos/service v1.2.4/go.mod h1:E4V9ufUuY82F7Ztlu1eN9VXWIQxg8NoLQlmFe0MtrXc=
 github.com/knadh/smtppool v1.3.0 h1:7Zcn1K7C83/rhGbetistO13yehTKe7YdRiK8PrMsIhE=
 github.com/knadh/smtppool v1.3.0/go.mod h1:3DJHouXAgPDBz0kC50HukOsdapYSwIEfJGwuip46oCA=
+github.com/knadh/smtppool/v2 v2.1.2 h1:FBpwnDTKmWwUy1reeeMeYJXl2QbUgVsKhAGVgJF3F2I=
+github.com/knadh/smtppool/v2 v2.1.2/go.mod h1:D7HcfSS8Xd3jpZ9LRwQ3aGdqp9FzFE66uW6w/BTpy4E=
 github.com/o1egl/paseto v1.0.0 h1:bwpvPu2au176w4IBlhbyUv/S5VPptERIA99Oap5qUd0=
 github.com/o1egl/paseto v1.0.0/go.mod h1:5HxsZPmw/3RI2pAwGo1HhOOwSdvBpcuVzO7uDkm+CLU=
 github.com/pkg/errors v0.8.0 h1:WdK/asTD0HN+q6hsWO3/vpuAkAr+tw6aNJNDFFf0+qw=
@@ -37,10 +39,6 @@ github.com/samber/slog-zap/v2 v2.6.4/go.mod h1:xgh/yVE+5h/7IHg8KB/18XFNg3z2XNFSb
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/takumakei/slogzap v1.0.0 h1:UUF1nMf0AEGxUpySyDeY4uPlkrqVEygyiwgWGZu49zc=
-github.com/takumakei/slogzap v1.0.0/go.mod h1:4LlzfxURn/fEuK9Ll//QujTB4AsS8/uMr7iitOuSpXA=
-github.com/wneessen/go-mail v0.7.2 h1:xxPnhZ6IZLSgxShebmZ6DPKh1b6OJcoHfzy7UjOkzS8=
-github.com/wneessen/go-mail v0.7.2/go.mod h1:+TkW6QP3EVkgTEqHtVmnAE/1MRhmzb8Y9/W3pweuS+k=
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
 go.uber.org/goleak v1.3.0/go.mod h1:CoHD4mav9JJNrW/WLlf7HGZPjdw8EucARQHekz1X6bE=
 go.uber.org/multierr v1.11.0 h1:blXXJkSxSSfBVBlC76pxqeO+LN3aDfLQo+309xJstO0=

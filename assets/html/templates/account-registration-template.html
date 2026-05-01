@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <title>Welcome to Sprinter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap"
+          rel="stylesheet"/>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, table, td, a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+
+        body {
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+
+        /* Base */
+        body {
+            background-color: #0a0a0a;
+            font-family: 'Barlow', Arial, sans-serif;
+        }
+
+        .email-wrapper {
+            background-color: #0a0a0a;
+            padding: 40px 20px;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #111111;
+            border: 1px solid #1e1e1e;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background-color: #0d0d0d;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-stripe {
+            height: 4px;
+            background: linear-gradient(90deg, #FF3B00 0%, #FF6B00 50%, #FFB800 100%);
+        }
+
+        .header-inner {
+            padding: 36px 48px 32px;
+            border-bottom: 1px solid #1e1e1e;
+            position: relative;
+        }
+
+        .logo-mark {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #FF3B00, #FFB800);
+            clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
+            display: inline-block;
+        }
+
+        .logo-text {
+            font-family: 'Barlow Condensed', Arial, sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 56px 48px 40px;
+            background: linear-gradient(160deg, #141414 0%, #111111 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 240px;
+            height: 240px;
+            background: radial-gradient(circle, rgba(255, 59, 0, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-eyebrow {
+            font-family: 'Barlow Condensed', Arial, sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #FF6B00;
+            margin-bottom: 16px;
+        }
+
+        .hero-heading {
+            font-family: 'Barlow Condensed', Arial, sans-serif;
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .hero-heading span {
+            display: block;
+            background: linear-gradient(90deg, #FF3B00, #FFB800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 15px;
+            font-weight: 300;
+            color: #888888;
+            line-height: 1.6;
+            margin-top: 20px;
+            max-width: 380px;
+        }
+
+        /* Body */
+        .body-section {
+            padding: 40px 48px;
+        }
+
+        .greeting {
+            font-size: 16px;
+            color: #cccccc;
+            font-weight: 400;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .greeting strong {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .body-text {
+            font-size: 15px;
+            color: #888888;
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+
+        /* CTA */
+        .cta-wrapper {
+            padding: 8px 48px 40px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(90deg, #FF3B00, #FF6B00);
+            color: #ffffff !important;
+            text-decoration: none;
+            font-family: 'Barlow Condensed', Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 16px 40px;
+            clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+        }
+
+        .cta-note {
+            font-size: 12px;
+            color: #555555;
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background-color: #1e1e1e;
+            margin: 0 48px;
+        }
+
+        /* Steps */
+        .steps-section {
+            padding: 40px 48px;
+        }
+
+        .steps-label {
+            font-family: 'Barlow Condensed', Arial, sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #444444;
+            margin-bottom: 24px;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .step-num {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #FF3B00, #FF6B00);
+            clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Barlow Condensed', Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .step-content {
+        }
+
+        .step-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #dddddd;
+            margin-bottom: 2px;
+        }
+
+        .step-desc {
+            font-size: 13px;
+            color: #555555;
+            line-height: 1.5;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            background-color: #0d0d0d;
+            border-top: 1px solid #1e1e1e;
+            border-bottom: 1px solid #1e1e1e;
+            padding: 28px 48px;
+            display: flex;
+            gap: 0;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 0 12px;
+            border-right: 1px solid #1e1e1e;
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-num {
+            font-family: 'Barlow Condensed', Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: #FF6B00;
+            letter-spacing: 0.04em;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #555555;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 32px 48px;
+            background-color: #0d0d0d;
+        }
+
+        .footer-logo {
+            font-family: 'Barlow Condensed', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #333333;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            font-size: 12px;
+            color: #444444;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        .footer-links a:hover {
+            color: #FF6B00;
+        }
+
+        .footer-text {
+            font-size: 11px;
+            color: #333333;
+            line-height: 1.7;
+        }
+
+        .footer-text a {
+            color: #444444;
+            text-decoration: underline;
+        }
+
+        /* Mobile */
+        @media only screen and (max-width: 600px) {
+            .header-inner {
+                padding: 28px 24px 24px;
+            }
+
+            .hero {
+                padding: 40px 24px 32px;
+            }
+
+            .hero-heading {
+                font-size: 38px;
+            }
+
+            .body-section {
+                padding: 32px 24px;
+            }
+
+            .cta-wrapper {
+                padding: 8px 24px 32px;
+            }
+
+            .divider {
+                margin: 0 24px;
+            }
+
+            .steps-section {
+                padding: 32px 24px;
+            }
+
+            .stats-bar {
+                padding: 24px;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .stat-item {
+                border-right: none;
+                min-width: 45%;
+            }
+
+            .footer {
+                padding: 28px 24px;
+            }
+
+            .step-row {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-wrapper">
+    <div class="email-container">
+
+        <!-- Header Stripe -->
+        <div class="header">
+            <div class="header-stripe"></div>
+            <div class="header-inner">
+          <span class="logo-mark">
+            <span class="logo-icon"></span>
+            <span class="logo-text">Sprinter</span>
+          </span>
+            </div>
+        </div>
+
+        <!-- Hero -->
+        <div class="hero">
+            <p class="hero-eyebrow">Account Confirmed</p>
+            <h1 class="hero-heading">
+                Ready.<br/>
+                <span>Set. Go.</span>
+            </h1>
+            <p class="hero-sub">Your account has been created, and you are officially on the grid. Welcome to the fastest
+                platform in the game.</p>
+        </div>
+
+        <!-- Body -->
+        <div class="body-section">
+            <p class="greeting">Hi <strong>{{first_name}}</strong>,</p>
+            <p class="body-text">
+                Thanks for registering with Sprinter. Your account is active and ready — everything you need to hit the
+                ground running is right here.
+            </p>
+            <p class="body-text">
+                Confirm your email below to unlock full access to your dashboard, integrations and performance
+                analytics.
+            </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Next Steps -->
+        <div class="steps-section">
+            <p class="steps-label">What's next</p>
+
+            <div class="step-row">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <p class="step-title">Complete your profile</p>
+                    <p class="step-desc">Add your details and preferences so Sprinter can tailor your experience.</p>
+                </div>
+            </div>
+
+            <div class="step-row">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <p class="step-title">Connect your tools</p>
+                    <p class="step-desc">Integrate with your existing stack in minutes using our native connectors.</p>
+                </div>
+            </div>
+
+            <div class="step-row">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <p class="step-title">Launch your first sprint</p>
+                    <p class="step-desc">Start tracking, shipping, and hitting targets faster than ever before.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-num">40K+</div>
+                <div class="stat-label">Active teams</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">2.4M</div>
+                <div class="stat-label">Sprints run</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">98%</div>
+                <div class="stat-label">Uptime SLA</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-logo">Sprinter</div>
+            <div class="footer-links">
+                <a href="{{help_url}}">Help Center</a>
+                <a href="{{docs_url}}">Docs</a>
+                <a href="{{unsubscribe_url}}">Unsubscribe</a>
+            </div>
+            <p class="footer-text">
+                © 2026 Sprinter, Inc. · 123 Sprint Ave, San Francisco, CA 94105<br/>
+                You are receiving this because you registered at <a href="{{site_url}}">sprinter.io</a>.<br/>
+                <a href="{{privacy_url}}">Privacy Policy</a> · <a href="{{terms_url}}">Terms of Service</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

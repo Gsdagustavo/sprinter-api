@@ -3,10 +3,12 @@ package usecases
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"path/filepath"
 	"strconv"
 	"strings"
 
+	"github.com/Gsdagustavo/sprinter-api/assets"
 	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
@@ -14,17 +16,21 @@ import (
 	"github.com/Gsdagustavo/sprinter-api/domain/util"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/mail"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 )
 
 func NewAuthenticationUseCase(
 	repository datastore.AuthRepository,
 	securityKey string,
 	storage filestore.FileStorage,
+		mailSender mail.Sender,
 ) domain.AuthenticationUseCase {
 	return authenticationUseCase{
 		repository:  repository,
 		securityKey: securityKey,
 		storage:     storage,
+		mailSender: mailSender,
 	}
 }
 
@@ -32,6 +38,7 @@ type authenticationUseCase struct {
 	repository  datastore.AuthRepository
 	securityKey string
 	storage     filestore.FileStorage
+	mailSender mail.Sender
 }
 
 func (a authenticationUseCase) AttemptLogin(
@@ -101,6 +108,19 @@ func (a authenticationUseCase) AttemptRegister(
 	token, err := util.GetNewAuthToken(userID, a.securityKey)
 	if err != nil {
 		return "", derr.JoinError("failed to generate token", err)
+	}
+
+	err = a.mailSender.SendMail(
+		[]string{credentials.Email},
+		"Sprinter Account", assets.AccountRegistrationTemplate,
+	)
+	if err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to send registration email",
+			slog.Int64("user_id", userID),
+			logger.Err(err),
+		)
 	}
 
 	return token, nil

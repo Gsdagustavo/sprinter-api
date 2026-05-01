@@ -1,21 +1,21 @@
 package mail
 
 import (
-	"net/smtp"
-
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
-	"github.com/knadh/smtppool"
+	"github.com/knadh/smtppool/v2"
 )
 
-func NewSender(settings entities.SMTPSettings) (Sender, error) {
+func NewMailSender(settings entities.Settings) (Sender, error) {
+	smtpSettings := settings.SMTPSettings
+
 	opts := smtppool.Opt{
-		Host:            settings.Host,
-		Port:            settings.Port,
-		MaxConns:        settings.MaxConnections,
-		IdleTimeout:     settings.IdleTimeout,
-		PoolWaitTimeout: settings.PoolWaitTimeout,
-		Auth:            smtp.PlainAuth("", settings.From, settings.Password, settings.Host),
+		Host:            smtpSettings.Host,
+		Port:            smtpSettings.Port,
+		MaxConns:        smtpSettings.MaxConnections,
+		IdleTimeout:     smtpSettings.IdleTimeout,
+		PoolWaitTimeout: smtpSettings.PoolWaitTimeout,
+		SSL:             smtppool.SSLNone,
 	}
 
 	pool, err := smtppool.New(opts)
@@ -25,7 +25,7 @@ func NewSender(settings entities.SMTPSettings) (Sender, error) {
 
 	return mailSender{
 		pool:     pool,
-		settings: settings,
+		settings: smtpSettings,
 	}, nil
 }
 
