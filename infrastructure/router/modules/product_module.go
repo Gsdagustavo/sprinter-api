@@ -32,21 +32,20 @@ func (m productModule) Path() string {
 	return m.path
 }
 
-func (m productModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router) {
-	defs := []router.RouteDefinition{
+func (m productModule) Routes() []router.RouteDefinition {
+	return []router.RouteDefinition{
 		{
 			Path:        "",
 			Description: "List products",
 			Handler:     m.listProducts,
 			HttpMethods: []string{http.MethodGet},
+			Public: true,
 		},
 	}
+}
 
-	for _, d := range defs {
-		r.HandleFunc(m.path+d.Path, d.Handler).Methods(d.HttpMethods...)
-	}
-
-	return defs, r
+func (m productModule) Middlewares() []mux.MiddlewareFunc {
+	return []mux.MiddlewareFunc{}
 }
 
 func (m productModule) listProducts(w http.ResponseWriter, r *http.Request) {

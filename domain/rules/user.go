@@ -29,7 +29,7 @@ const (
 	BiographyMaxLetters = 100
 )
 
-func ValidateUserInformation(userInformation entities.AccountInformation) error {
+func ValidateUserInformation(userInformation entities.UserInformation) error {
 	err := ValidateName(userInformation.Username)
 	if err != nil {
 		return err

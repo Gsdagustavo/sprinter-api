@@ -41,19 +41,21 @@ func (m authModule) Path() string {
 	return m.path
 }
 
-func (m authModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router) {
-	defs := []router.RouteDefinition{
+func (m authModule) Routes() []router.RouteDefinition {
+	return []router.RouteDefinition{
 		{
 			Path:        "/login",
 			Description: "Attempt user login",
 			Handler:     m.login,
 			HttpMethods: []string{http.MethodPost},
+			Public: true,
 		},
 		{
 			Path:        "/register",
 			Description: "Attempt user register",
 			Handler:     m.register,
 			HttpMethods: []string{http.MethodPost},
+			Public: true,
 		},
 		{
 			Path:        "/completeRegistration",
@@ -62,27 +64,20 @@ func (m authModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router)
 			HttpMethods: []string{http.MethodPost},
 		},
 	}
+}
 
-	for _, d := range defs {
-		r.HandleFunc(m.path+d.Path, d.Handler).Methods(d.HttpMethods...)
-	}
-
-	return defs, r
+func (m authModule) Middlewares() []mux.MiddlewareFunc {
+	return []mux.MiddlewareFunc{m.sessionMiddleware}
 }
 
 func (m authModule) sessionMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+
 		authHeader := r.Header.Get("Authorization")
 
 		var user *entities.User
-
-		unauthorizedBytes, err := json.Marshal(derr.UnauthorizedError)
-		if err != nil {
-			slog.ErrorContext(ctx, "failed to marshal error response", logger.Err(err))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		var err error
 
 		// Test basic auth
 		email, password, ok := r.BasicAuth()
@@ -94,52 +89,48 @@ func (m authModule) sessionMiddleware(next http.Handler) http.Handler {
 
 			valid, err := m.authUseCases.CheckCredentials(ctx, credentials)
 			if err != nil {
-				slog.ErrorContext(ctx, "failed to check credentials", logger.Err(err))
-				_ = router.Write(w, unauthorizedBytes)
+				slog.ErrorContext(ctx, "failed to check user credentials", "cause", err)
+				router.HandleError(w, derr.UnauthorizedError)
 				return
 			}
 
 			if !valid {
-				slog.ErrorContext(ctx, "invalid credentials")
-				_ = router.Write(w, unauthorizedBytes)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
 
 			user, err = m.authUseCases.GetUserByEmail(ctx, credentials.Email)
 			if err != nil {
-				slog.ErrorContext(ctx, "failed to get user by document", logger.Err(err))
-				_ = router.Write(w, unauthorizedBytes)
+				slog.ErrorContext(ctx, "failed to get user by email", "cause", err)
+				router.HandleError(w, derr.UnauthorizedError)
 				return
 			}
 
 			if user == nil {
-				slog.ErrorContext(ctx, "user not found in context")
-				_ = router.Write(w, unauthorizedBytes)
+				http.Error(w, "user not found", http.StatusUnauthorized)
 				return
 			}
 		} else {
 			var token string
-			var err error
-
 			if authHeader != "" {
 				token = strings.ReplaceAll(authHeader, "Bearer ", "")
 			}
 
 			if token == "" {
 				slog.ErrorContext(ctx, "no token found in the request")
-				_ = router.Write(w, unauthorizedBytes)
+				router.HandleError(w, derr.UnauthorizedError)
 				return
 			}
 
 			user, err = m.authUseCases.GetUserByToken(ctx, token)
 			if err != nil {
-				slog.ErrorContext(ctx, "failed to get user from token", logger.Err(err))
+				slog.ErrorContext(ctx, "failed to get user from token", "cause", err)
+				router.HandleError(w, derr.UnauthorizedError)
 				return
 			}
 
 			if user == nil {
-				slog.ErrorContext(ctx, "user not found in context")
-				_ = router.Write(w, unauthorizedBytes)
+				http.Error(w, "user not found", http.StatusUnauthorized)
 				return
 			}
 		}
@@ -257,7 +248,7 @@ func (m authModule) completeRegistration(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	var information entities.AccountInformation
+	var information entities.UserInformation
 	err = json.Unmarshal(body, &information)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to unmarshal request body", logger.Err(err))

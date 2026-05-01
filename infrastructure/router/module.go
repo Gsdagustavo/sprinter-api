@@ -13,10 +13,11 @@ type Module interface {
 	// Path returns the module base path
 	Path() string
 
-	// Setup sets all the route handlers
-	//
-	// Returns a list of all the routes defined by the module and optionally a new router base
-	Setup(r *mux.Router) ([]RouteDefinition, *mux.Router)
+	// Routes returns all the module's routes
+	Routes() []RouteDefinition
+
+	// Middlewares returns all the module's middlewares
+	Middlewares() []mux.MiddlewareFunc
 }
 
 type RouteDefinition struct {
@@ -31,4 +32,7 @@ type RouteDefinition struct {
 
 	// HttpMethods is a list of HTTP methods accepted by the route
 	HttpMethods []string
+
+	// Public defines whether the route is public
+	Public bool
 }

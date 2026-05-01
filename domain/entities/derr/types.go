@@ -50,6 +50,13 @@ func NewBadRequestError(message string) ClientError {
 	}
 }
 
+func NewNotFoundError(message string) ClientError {
+	return ClientError{
+		Code:    "NOT_FOUND",
+		Message: message,
+	}
+}
+
 func NewUnauthorizedError(message string) ClientError {
 	return ClientError{
 		Code:    "UNAUTHORIZED",

@@ -8,14 +8,15 @@ import (
 
 	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/gorilla/mux"
 )
 
-func NewUserModule(userUsecase domain.UserUseCase) router.Module {
+func NewUserModule(userUseCases domain.UserUseCase) router.Module {
 	return userModule{
-		userUseCases: userUsecase,
+		userUseCases: userUseCases,
 		name:         "User",
 		path:         "/user",
 	}
@@ -35,24 +36,23 @@ func (m userModule) Path() string {
 	return m.path
 }
 
-func (m userModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router) {
-	defs := []router.RouteDefinition{
+func (m userModule) Routes() []router.RouteDefinition {
+	return []router.RouteDefinition{
 		{
-			Path:        "",
-			Description: "Edit user profile",
-			Handler:     m.editUser,
+			Path:        "/update-information",
+			Description: "Update user information",
+			Handler:     m.updateUserInformation,
 			HttpMethods: []string{http.MethodPut},
+			Public:      false,
 		},
 	}
-
-	for _, d := range defs {
-		r.HandleFunc(m.path+d.Path, d.Handler).Methods(d.HttpMethods...)
-	}
-
-	return defs, r
 }
 
-func (m userModule) editUser(w http.ResponseWriter, r *http.Request) {
+func (m userModule) Middlewares() []mux.MiddlewareFunc {
+	return []mux.MiddlewareFunc{}
+}
+
+func (m userModule) updateUserInformation(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, err := router.GetUser(r)
 	if err != nil {
@@ -68,18 +68,18 @@ func (m userModule) editUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var userInformation entities.AccountInformation
+	var userInformation entities.UserInformation
 	err = json.Unmarshal(body, &userInformation)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to unmarshal request body", logger.Err(err))
-		router.HandleError(w, err)
+		router.HandleError(w, derr.BadRequestError)
 		return
 	}
 
 	userInformation.ID = user.ID
-	response, err := m.userUseCases.UpdateUserProfile(ctx, userInformation)
+	response, err := m.userUseCases.UpdateUserInformation(ctx, userInformation)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to edit user", logger.Err(err))
+		slog.ErrorContext(ctx, "failed to update user information", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}

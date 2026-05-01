@@ -1,0 +1,7 @@
+PUT http://localhost:8000/api/user/update-information
+Authorization: Bearer v2.local.rtQIardQRfklBDbo5FtHQ_rD5ReHe2PjL26Ndrek603bcw3-qJs-PNyiGrWKnPF7fFVIyAcKrNvXpTzHxqmv-MkGqrTx__oQ_7kbsSdDqNG5Sd4rKpuQjohKkivXOQSpRqj9pP-cSZaLWS1DdgknEas2r1B8qJC32nimbwcMZoxrU_g7O90JiqE-p2m3utv0qCTJLuoMh6Mn73mB3aBfUxVIuielrMLqWDlXKhbdQA7Ao3hu2Dks5SgMx2wO6BxiBoT2HmYvNI8JUCw483fkJbhcRIqeBz6b3ROpsI4XpQ.eyJleHBpcmVzX2F0IjoiMjAyNi0wNS0wOFQxNTowNzo0MS41ODcxOTE5WiJ9
+
+{
+    "username": "Meu nome",
+    "biography": "        "
+}

@@ -53,8 +53,22 @@ func SetupModules(r *mux.Router, settings entities.Settings) error {
 	}
 
 	apiSubRouter := r.PathPrefix("/api").Subrouter()
+
 	for _, module := range modules {
-		module.Setup(apiSubRouter)
+		moduleRouter := apiSubRouter.PathPrefix(module.Path()).Subrouter()
+
+		protectedRouter := moduleRouter.NewRoute().Subrouter()
+		for _, mw := range module.Middlewares() {
+			protectedRouter.Use(mw)
+		}
+
+		for _, d := range module.Routes() {
+			target := protectedRouter
+			if d.Public {
+				target = moduleRouter
+			}
+			target.HandleFunc(d.Path, d.Handler).Methods(d.HttpMethods...)
+		}
 	}
 
 	r.Use(router.LoggingMiddleware)

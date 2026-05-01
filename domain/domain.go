@@ -38,7 +38,7 @@ type AuthenticationUseCase interface {
 	// AttemptCompleteRegistration tries to complete the user registration
 	AttemptCompleteRegistration(
 		ctx context.Context,
-		information entities.AccountInformation,
+		information entities.UserInformation,
 	) error
 
 	// UploadProfileImage uploads a profile image for the user with the given ID
@@ -57,11 +57,11 @@ type UserUseCase interface {
 		userID int64,
 		image []byte,
 	) (string, error)
-	
-	// UpdateUserProfile update the user profile from a user with the given information
-	UpdateUserProfile(
+
+	// UpdateUserInformation updates the user information.
+	UpdateUserInformation(
 		ctx context.Context,
-		userInformation entities.AccountInformation,
+		userInformation entities.UserInformation,
 	) (*entities.User, error)
 }
 

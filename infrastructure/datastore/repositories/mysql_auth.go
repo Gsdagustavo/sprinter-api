@@ -146,7 +146,7 @@ func (r authenticationRepository) GetUserByID(
 
 func (r authenticationRepository) AttemptCompleteRegistration(
 	ctx context.Context,
-	information entities.AccountInformation,
+		information entities.UserInformation,
 ) error {
 	const query = `UPDATE users SET username = ?, biography = ? WHERE id = ?`
 

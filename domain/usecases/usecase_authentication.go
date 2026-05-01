@@ -158,7 +158,7 @@ func (a authenticationUseCase) GetUserByToken(
 
 func (a authenticationUseCase) AttemptCompleteRegistration(
 	ctx context.Context,
-	information entities.AccountInformation,
+	information entities.UserInformation,
 ) error {
 	information.Username = strings.TrimSpace(information.Username)
 	information.Biography = strings.TrimSpace(information.Biography)

@@ -24,14 +24,14 @@ type userRepository struct {
 	settings datastore.RepositorySettings
 }
 
-func (r *userRepository) UpdateUserProfile(
+func (r *userRepository) UpdateUserInformation(
 	ctx context.Context,
-	accountInformation entities.AccountInformation,
+	accountInformation entities.UserInformation,
 ) error {
 	const query = `
 	UPDATE users
 	SET username = ?,
-		biography = ?,
+		biography = ?
 	WHERE id = ?
 	`
 

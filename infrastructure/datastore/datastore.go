@@ -49,16 +49,16 @@ type AuthRepository interface {
 	// AttemptCompleteRegistration tries to complete the user registration
 	AttemptCompleteRegistration(
 		ctx context.Context,
-		information entities.AccountInformation,
+			information entities.UserInformation,
 	) error
 }
 
 // UserRepository define methods for managing user data
 type UserRepository interface {
 	// UpdateUserProfile attempts to edit an user profile with the given information
-	UpdateUserProfile(
+	UpdateUserInformation(
 		ctx context.Context,
-		accountInformation entities.AccountInformation,
+			accountInformation entities.UserInformation,
 	) error
 
 	// GetUserById attempts to get the user from the given user id

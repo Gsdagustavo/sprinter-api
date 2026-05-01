@@ -34,7 +34,7 @@ type User struct {
 	ModifiedAt time.Time `json:"modified_at,omitempty"`
 }
 
-// UserCredentials is an entity that represents a user credentials .
+// UserCredentials is an entity that represents a user credentials.
 type UserCredentials struct {
 	// Name in the credential entity.
 	Name string `json:"name,omitempty"`
@@ -46,8 +46,8 @@ type UserCredentials struct {
 	Password string `json:"password,omitempty"`
 }
 
-// AccountInformation is an entity that represents the information for user complete his registration
-type AccountInformation struct {
+// UserInformation is an entity that represents details about a user.
+type UserInformation struct {
 	// ID is the unique identifier for the user
 	ID int64 `json:"id"`
 
