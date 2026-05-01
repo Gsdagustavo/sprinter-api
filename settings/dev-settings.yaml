@@ -22,7 +22,7 @@ LogSettings:
   LogDir: "./runtime/logs"
 
 PasetoSettings:
-  PasetoSecurityKey: "b7e16bf2-ab0f-4a68-a16b-f2ab0f6a"
+  PasetoSecurityKey: "ldJfKJMxCMSxQWpjkWRjUPUjdzlbQVdU"
 
 CORSConfig:
   CORSOrigins:
@@ -34,9 +34,9 @@ FileStorageSettings:
 SMTPSettings:
   Host: "localhost"
   Port: 1025
-  User: "test"
-  Password: "test"
-  From: "dev@test.com"
+  User: "Sprinter"
+  Password: "ytlLhqKiVwCgObHZTpzZRSYFVSBRQdOA"
+  From: "no-reply@spinter.com"
   MaxConnections: 5
   IdleTimeout: 30s
   PoolWaitTimeout: 10s
