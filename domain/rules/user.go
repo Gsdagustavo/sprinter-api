@@ -42,6 +42,7 @@ func ValidateUserInformation(userInformation entities.AccountInformation) error 
 
 	return nil
 }
+
 func ValidateEmail(email string) bool {
 	res, err := mail.ParseAddress(email)
 	return err == nil && res.Address == email

@@ -57,6 +57,7 @@ type UserUseCase interface {
 		userID int64,
 		image []byte,
 	) (string, error)
+	
 	// UpdateUserProfile update the user profile from a user with the given information
 	UpdateUserProfile(
 		ctx context.Context,
