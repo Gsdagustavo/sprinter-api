@@ -3,26 +3,26 @@ package usecases
 import (
 	"context"
 
-	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/domain/rules"
-	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
+	"github.com/Gsdagustavo/sprinter-api/domain/usecases"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
 )
 
-type productUseCases struct {
-	repository datastore.ProductRepository
-}
-
-func NewProductUseCases(repository datastore.ProductRepository) domain.ProductUseCase {
+func NewProductUseCases(repository repositories.ProductRepository) usecases.ProductUseCase {
 	return productUseCases{
 		repository: repository,
 	}
 }
 
+type productUseCases struct {
+	repository repositories.ProductRepository
+}
+
 func (p productUseCases) AddNewProduct(
-	ctx context.Context,
-	product *entities.Product,
+		ctx context.Context,
+		product *entities.Product,
 ) (int64, error) {
 	err := rules.ValidateProduct(product)
 	if err != nil {
@@ -37,8 +37,8 @@ func (p productUseCases) DeleteProduct(ctx context.Context, id int64) error {
 }
 
 func (p productUseCases) UpdateProduct(
-	ctx context.Context,
-	product *entities.Product,
+		ctx context.Context,
+		product *entities.Product,
 ) error {
 	err := rules.ValidateProduct(product)
 	if err != nil {
@@ -49,15 +49,15 @@ func (p productUseCases) UpdateProduct(
 }
 
 func (p productUseCases) GetProductByID(
-	ctx context.Context,
-	id int64,
+		ctx context.Context,
+		id int64,
 ) (*entities.Product, error) {
 	return p.repository.GetProductByID(ctx, id)
 }
 
 func (p productUseCases) GetProducts(
-	ctx context.Context,
-	filter entities.GeneralFilter,
+		ctx context.Context,
+		filter entities.GeneralFilter,
 ) (*entities.PaginatedList[entities.Product], error) {
 	products, err := p.repository.GetProducts(ctx, filter)
 	if err != nil {

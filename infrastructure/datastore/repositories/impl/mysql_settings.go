@@ -8,7 +8,7 @@ import (
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
-	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -16,11 +16,12 @@ type settingsRepository struct {
 	connection *sql.DB
 }
 
-func NewSettingsRepository(config entities.Settings) (datastore.RepositorySettings, error) {
+func NewSettingsRepository(config entities.Settings) (repositories.SettingsRepository, error) {
 	db, err := setupConnection(config)
 	if err != nil {
 		return nil, err
 	}
+
 	return settingsRepository{
 		connection: db,
 	}, nil
@@ -40,7 +41,7 @@ func (s settingsRepository) Dismount() error {
 }
 
 func (s settingsRepository) ServerTime(
-	ctx context.Context,
+		ctx context.Context,
 ) (*time.Time, error) {
 	//language=sql
 	query := "SELECT CURRENT_TIMESTAMP"

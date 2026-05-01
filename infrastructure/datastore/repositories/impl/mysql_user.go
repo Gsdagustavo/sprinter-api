@@ -7,12 +7,12 @@ import (
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
-	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
 )
 
 func NewUserRepository(
-	settings datastore.RepositorySettings,
-) datastore.UserRepository {
+		settings repositories.SettingsRepository,
+) repositories.UserRepository {
 	return &userRepository{
 		conn:     settings.Connection(),
 		settings: settings,
@@ -21,12 +21,12 @@ func NewUserRepository(
 
 type userRepository struct {
 	conn     *sql.DB
-	settings datastore.RepositorySettings
+	settings repositories.SettingsRepository
 }
 
 func (r *userRepository) UpdateUserInformation(
-	ctx context.Context,
-	accountInformation entities.UserInformation,
+		ctx context.Context,
+		accountInformation entities.UserInformation,
 ) error {
 	const query = `
 	UPDATE users

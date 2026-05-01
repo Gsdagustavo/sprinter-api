@@ -7,8 +7,8 @@ import (
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
-	"github.com/Gsdagustavo/sprinter-api/domain/usecases"
-	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
+	usecases "github.com/Gsdagustavo/sprinter-api/domain/usecases/impl"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories/impl"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore/hdstore"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/mail"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router"

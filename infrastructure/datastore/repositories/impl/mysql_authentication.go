@@ -8,24 +8,24 @@ import (
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/domain/util"
-	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
 )
 
-type authenticationRepository struct {
-	conn     *sql.DB
-	settings datastore.RepositorySettings
-}
-
-func NewAuthenticationRepository(settings datastore.RepositorySettings) datastore.AuthRepository {
+func NewAuthenticationRepository(settings repositories.SettingsRepository) repositories.AuthRepository {
 	return &authenticationRepository{
 		conn:     settings.Connection(),
 		settings: settings,
 	}
 }
 
+type authenticationRepository struct {
+	conn     *sql.DB
+	settings repositories.SettingsRepository
+}
+
 func (r authenticationRepository) GetUserByEmail(
-	ctx context.Context,
-	email string,
+		ctx context.Context,
+		email string,
 ) (*entities.User, error) {
 	const query = `
 	SELECT 
@@ -60,8 +60,8 @@ func (r authenticationRepository) GetUserByEmail(
 }
 
 func (r authenticationRepository) AttemptRegister(
-	ctx context.Context,
-	credentials entities.UserCredentials,
+		ctx context.Context,
+		credentials entities.UserCredentials,
 ) (int64, error) {
 	const query = `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`
 
@@ -85,8 +85,8 @@ func (r authenticationRepository) AttemptRegister(
 }
 
 func (r authenticationRepository) CheckUserCredentials(
-	ctx context.Context,
-	credentials entities.UserCredentials,
+		ctx context.Context,
+		credentials entities.UserCredentials,
 ) (bool, error) {
 	query := `
 	SELECT password 
@@ -109,8 +109,8 @@ func (r authenticationRepository) CheckUserCredentials(
 }
 
 func (r authenticationRepository) GetUserByID(
-	ctx context.Context,
-	userID int64,
+		ctx context.Context,
+		userID int64,
 ) (*entities.User, error) {
 	const query = `
 	SELECT 
@@ -145,7 +145,7 @@ func (r authenticationRepository) GetUserByID(
 }
 
 func (r authenticationRepository) AttemptCompleteRegistration(
-	ctx context.Context,
+		ctx context.Context,
 		information entities.UserInformation,
 ) error {
 	const query = `UPDATE users SET username = ?, biography = ? WHERE id = ?`

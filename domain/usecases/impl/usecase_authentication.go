@@ -9,23 +9,23 @@ import (
 	"strings"
 
 	"github.com/Gsdagustavo/sprinter-api/assets"
-	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/domain/rules"
+	"github.com/Gsdagustavo/sprinter-api/domain/usecases"
 	"github.com/Gsdagustavo/sprinter-api/domain/util"
-	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/mail"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 )
 
 func NewAuthenticationUseCase(
-	repository datastore.AuthRepository,
-	securityKey string,
-	storage filestore.FileStorage,
+		repository repositories.AuthRepository,
+		securityKey string,
+		storage filestore.FileStorage,
 		mailSender mail.Sender,
-) domain.AuthenticationUseCase {
+) usecases.AuthenticationUseCase {
 	return authenticationUseCase{
 		repository:  repository,
 		securityKey: securityKey,
@@ -35,15 +35,15 @@ func NewAuthenticationUseCase(
 }
 
 type authenticationUseCase struct {
-	repository  datastore.AuthRepository
+	repository  repositories.AuthRepository
 	securityKey string
 	storage     filestore.FileStorage
 	mailSender mail.Sender
 }
 
 func (a authenticationUseCase) AttemptLogin(
-	ctx context.Context,
-	credentials entities.UserCredentials,
+		ctx context.Context,
+		credentials entities.UserCredentials,
 ) (string, error) {
 	if err := rules.ValidateCredentials(credentials); err != nil {
 		return "", derr.InvalidCredentials
@@ -76,8 +76,8 @@ func (a authenticationUseCase) AttemptLogin(
 }
 
 func (a authenticationUseCase) AttemptRegister(
-	ctx context.Context,
-	credentials entities.UserCredentials,
+		ctx context.Context,
+		credentials entities.UserCredentials,
 ) (string, error) {
 	if err := rules.ValidateCredentials(credentials); err != nil {
 		return "", err
@@ -127,22 +127,22 @@ func (a authenticationUseCase) AttemptRegister(
 }
 
 func (a authenticationUseCase) GetUserByEmail(
-	ctx context.Context,
-	email string,
+		ctx context.Context,
+		email string,
 ) (*entities.User, error) {
 	return a.repository.GetUserByEmail(ctx, email)
 }
 
 func (a authenticationUseCase) CheckCredentials(
-	ctx context.Context,
-	credentials entities.UserCredentials,
+		ctx context.Context,
+		credentials entities.UserCredentials,
 ) (bool, error) {
 	return a.repository.CheckUserCredentials(ctx, credentials)
 }
 
 func (a authenticationUseCase) GetUserByToken(
-	ctx context.Context,
-	token string,
+		ctx context.Context,
+		token string,
 ) (*entities.User, error) {
 	id, expired, err := util.GetUserIDFromToken(token, a.securityKey)
 	if err != nil {
@@ -157,8 +157,8 @@ func (a authenticationUseCase) GetUserByToken(
 }
 
 func (a authenticationUseCase) AttemptCompleteRegistration(
-	ctx context.Context,
-	information entities.UserInformation,
+		ctx context.Context,
+		information entities.UserInformation,
 ) error {
 	information.Username = strings.TrimSpace(information.Username)
 	information.Biography = strings.TrimSpace(information.Biography)
@@ -181,9 +181,9 @@ func (a authenticationUseCase) AttemptCompleteRegistration(
 }
 
 func (a authenticationUseCase) UploadProfileImage(
-	_ context.Context,
-	userID int64,
-	image []byte,
+		_ context.Context,
+		userID int64,
+		image []byte,
 ) error {
 	const profileFolderPath = "/user/profile"
 

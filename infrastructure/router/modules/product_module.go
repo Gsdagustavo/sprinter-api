@@ -4,19 +4,19 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/Gsdagustavo/sprinter-api/domain"
+	"github.com/Gsdagustavo/sprinter-api/domain/usecases"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/gorilla/mux"
 )
 
 type productModule struct {
-	productUseCases domain.ProductUseCase
+	productUseCases usecases.ProductUseCase
 	name            string
 	path            string
 }
 
-func NewProductModule(productUseCases domain.ProductUseCase) router.Module {
+func NewProductModule(productUseCases usecases.ProductUseCase) router.Module {
 	return productModule{
 		productUseCases: productUseCases,
 		name:            "Product",

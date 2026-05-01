@@ -7,21 +7,21 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
+	"github.com/Gsdagustavo/sprinter-api/domain/usecases"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/gorilla/mux"
 )
 
 type authModule struct {
-	authUseCases domain.AuthenticationUseCase
+	authUseCases usecases.AuthenticationUseCase
 	name         string
 	path         string
 }
 
-func NewAuthModule(authUseCases domain.AuthenticationUseCase) router.Module {
+func NewAuthModule(authUseCases usecases.AuthenticationUseCase) router.Module {
 	return authModule{
 		authUseCases: authUseCases,
 		name:         "Authentication",

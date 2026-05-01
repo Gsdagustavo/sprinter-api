@@ -6,15 +6,15 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
+	"github.com/Gsdagustavo/sprinter-api/domain/usecases"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/gorilla/mux"
 )
 
-func NewUserModule(userUseCases domain.UserUseCase) router.Module {
+func NewUserModule(userUseCases usecases.UserUseCase) router.Module {
 	return userModule{
 		userUseCases: userUseCases,
 		name:         "User",
@@ -23,7 +23,7 @@ func NewUserModule(userUseCases domain.UserUseCase) router.Module {
 }
 
 type userModule struct {
-	userUseCases domain.UserUseCase
+	userUseCases usecases.UserUseCase
 	name         string
 	path         string
 }

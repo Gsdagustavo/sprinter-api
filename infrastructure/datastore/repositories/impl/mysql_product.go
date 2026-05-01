@@ -7,9 +7,10 @@ import (
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
 )
 
-func NewProductRepository(settings datastore.RepositorySettings) datastore.ProductRepository {
+func NewProductRepository(settings repositories.SettingsRepository) repositories.ProductRepository {
 	return &productRepository{
 		conn:     settings.Connection(),
 		settings: settings,
@@ -18,7 +19,7 @@ func NewProductRepository(settings datastore.RepositorySettings) datastore.Produ
 
 type productRepository struct {
 	conn     *sql.DB
-	settings datastore.RepositorySettings
+	settings repositories.SettingsRepository
 }
 
 func (r productRepository) AddNewProduct(ctx context.Context, product *entities.Product) (int64, error) {
@@ -131,8 +132,8 @@ func (r productRepository) GetProductByID(ctx context.Context, id int64) (*entit
 }
 
 func (r productRepository) GetProducts(
-	ctx context.Context,
-	filter entities.GeneralFilter,
+		ctx context.Context,
+		filter entities.GeneralFilter,
 ) (*entities.PaginatedList[entities.Product], error) {
 	query := `
 	SELECT

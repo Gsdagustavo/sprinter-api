@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/Gsdagustavo/sprinter-api/domain"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/domain/rules"
-	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore"
+	"github.com/Gsdagustavo/sprinter-api/domain/usecases"
+	"github.com/Gsdagustavo/sprinter-api/infrastructure/datastore/repositories"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/filestore"
 )
 
 func NewUserUseCases(
-	storage filestore.FileStorage,
-	storageConfig entities.FileStorageSettings,
-	userRepo datastore.UserRepository,
-) domain.UserUseCase {
+		storage filestore.FileStorage,
+		storageConfig entities.FileStorageSettings,
+		userRepo repositories.UserRepository,
+) usecases.UserUseCase {
 	return userUseCase{
 		storage:       storage,
 		storageConfig: storageConfig,
@@ -28,12 +28,12 @@ func NewUserUseCases(
 type userUseCase struct {
 	storage       filestore.FileStorage
 	storageConfig entities.FileStorageSettings
-	userRepo      datastore.UserRepository
+	userRepo      repositories.UserRepository
 }
 
 func (u userUseCase) UpdateUserInformation(
-	ctx context.Context,
-	userInformation entities.UserInformation,
+		ctx context.Context,
+		userInformation entities.UserInformation,
 ) (*entities.User, error) {
 	err := rules.ValidateUserInformation(userInformation)
 	if err != nil {
@@ -54,8 +54,8 @@ func (u userUseCase) UpdateUserInformation(
 }
 
 func (u userUseCase) SaveUserProfilePicture(
-	userID int64,
-	image []byte,
+		userID int64,
+		image []byte,
 ) (string, error) {
 	userFolder := u.getUserFolder(userID)
 	imagePath := path.Join(userFolder, "profile.jpg")
@@ -74,7 +74,7 @@ func (u userUseCase) SaveUserProfilePicture(
 }
 
 func (u userUseCase) getUserFolder(
-	userID int64,
+		userID int64,
 ) string {
 	storageFolder := u.storageConfig.StorageFolder
 	userFolder := path.Join(storageFolder, fmt.Sprintf("%d", userID))
