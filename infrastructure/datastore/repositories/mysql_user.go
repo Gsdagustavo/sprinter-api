@@ -35,13 +35,20 @@ func (r *userRepository) UpdateUserProfile(
 	WHERE id = ?
 	`
 
-	_, err := r.conn.ExecContext(ctx, query, &accountInformation.Username, &accountInformation.Biography, &accountInformation.ID)
+	_, err := r.conn.ExecContext(
+		ctx,
+		query,
+		&accountInformation.Username,
+		&accountInformation.Biography,
+		&accountInformation.ID,
+	)
 	if err != nil {
 		return derr.JoinError("failed to execute query", err)
 	}
 
 	return nil
 }
+
 func (r *userRepository) GetUserById(ctx context.Context, id int64) (*entities.User, error) {
 	const query = `
 	SELECT 

@@ -13,6 +13,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func NewUserModule(userUsecase domain.UserUseCase) router.Module {
+	return userModule{
+		userUseCases: userUsecase,
+		name:         "User",
+		path:         "/user",
+	}
+}
+
 type userModule struct {
 	userUseCases domain.UserUseCase
 	name         string
@@ -42,14 +50,6 @@ func (m userModule) Setup(r *mux.Router) ([]router.RouteDefinition, *mux.Router)
 	}
 
 	return defs, r
-}
-
-func NewUserModule(userUsecase domain.UserUseCase) router.Module {
-	return userModule{
-		userUseCases: userUsecase,
-		name:         "User",
-		path:         "/user",
-	}
 }
 
 func (m userModule) editUser(w http.ResponseWriter, r *http.Request) {
@@ -83,6 +83,7 @@ func (m userModule) editUser(w http.ResponseWriter, r *http.Request) {
 		router.HandleError(w, err)
 		return
 	}
+
 	err = router.Write(w, response)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
