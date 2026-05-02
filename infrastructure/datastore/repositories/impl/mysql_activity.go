@@ -38,7 +38,7 @@ func (r activityRepository) StartActivity(
 		query,
 		activity.UserID,
 		activity.Type,
-		activity.StartTime,
+		activity.StartDate,
 	)
 	if err != nil {
 		return -1, derr.JoinError("failed to execute query", err)
