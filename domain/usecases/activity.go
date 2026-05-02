@@ -8,8 +8,8 @@ import (
 
 // ActivityUseCase defines a use case interface with methods related to activity managing
 type ActivityUseCase interface {
-	// AddNewActivity attempts to add a new activity with the given information
-	AddNewActivity(
+	// StartActivity attempts to start a new activity with the given information
+	StartActivity(
 		ctx context.Context,
 		activity entities.Activity,
 	) (int64, error)

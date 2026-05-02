@@ -21,28 +21,24 @@ type activityRepository struct {
 	settings repositories.SettingsRepository
 }
 
-func (r activityRepository) AddNewActivity(
+func (r activityRepository) StartActivity(
 	ctx context.Context,
 	activity entities.Activity,
 ) (int64, error) {
 	const query = `
 	INSERT INTO activities (
-		uuid,
 		user_id,
 		type,
-		start_time,
-		end_time) 
-	VALUES (?, ?, ?, ?, ?)
+	    start_date,
+	VALUES ( ?, ?, ?)
 `
 
 	res, err := r.conn.ExecContext(
 		ctx,
 		query,
-		activity.UUID,
 		activity.UserID,
 		activity.Type,
 		activity.StartTime,
-		activity.EndTime,
 	)
 	if err != nil {
 		return -1, derr.JoinError("failed to execute query", err)

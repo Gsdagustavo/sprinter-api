@@ -40,8 +40,8 @@ func (m activityModule) Routes() []router.RouteDefinition {
 	return []router.RouteDefinition{
 		{
 			Path:        "",
-			Description: "Add new activity",
-			Handler:     m.addNewActivity,
+			Description: "Start new activity",
+			Handler:     m.startActivity,
 			HttpMethods: []string{http.MethodPost},
 			Public:      false,
 		},
@@ -51,7 +51,7 @@ func (m activityModule) Routes() []router.RouteDefinition {
 func (m activityModule) Middlewares() []mux.MiddlewareFunc {
 	return []mux.MiddlewareFunc{}
 }
-func (m activityModule) addNewActivity(w http.ResponseWriter, r *http.Request) {
+func (m activityModule) startActivity(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, err := router.GetUser(r)
 	if err != nil {
@@ -76,7 +76,7 @@ func (m activityModule) addNewActivity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	activity.UserID = user.ID
-	response, err := m.activityUseCases.AddNewActivity(ctx, activity)
+	response, err := m.activityUseCases.StartActivity(ctx, activity)
 
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to add new activity", logger.Err(err))

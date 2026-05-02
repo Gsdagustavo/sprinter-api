@@ -42,19 +42,17 @@ CREATE TABLE products
 
 CREATE TABLE activities (
                             id INT AUTO_INCREMENT PRIMARY KEY,
-                            uuid CHAR(36) NOT NULL UNIQUE,
                             user_id INT NOT NULL,
                             type INT NOT NULL,
-                            start_time DATETIME(6),
-                            end_time DATETIME(6),
-                            created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-                            modified_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                            start_date DATETIME,
+                            end_date DATETIME,
+                            created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            modified_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(6),
                             INDEX idx_user_id (user_id)
 );
 
 CREATE TABLE points (
                         id INT AUTO_INCREMENT PRIMARY KEY,
-                        uuid CHAR(36) NOT NULL UNIQUE,
                         activity_id INT NOT NULL,
                         latitude DOUBLE NOT NULL,
                         longitude DOUBLE NOT NULL,
