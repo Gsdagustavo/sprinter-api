@@ -58,8 +58,8 @@ CREATE TABLE points (
                         activity_id INT NOT NULL,
                         latitude DOUBLE NOT NULL,
                         longitude DOUBLE NOT NULL,
-                        created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-                        modified_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                        modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
                         CONSTRAINT fk_points_activity
                             FOREIGN KEY (activity_id)
                                 REFERENCES activities(id)
