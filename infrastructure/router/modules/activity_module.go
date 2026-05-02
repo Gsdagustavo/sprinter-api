@@ -67,7 +67,7 @@ func (m activityModule) startActivity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var activity entities.Activity
+	var activity *entities.Activity
 	err = json.Unmarshal(body, &activity)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to unmarshal request body", logger.Err(err))
@@ -78,7 +78,7 @@ func (m activityModule) startActivity(w http.ResponseWriter, r *http.Request) {
 	activity.UserID = user.ID
 	response, err := m.activityUseCases.StartActivity(ctx, activity)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to add new activity", logger.Err(err))
+		slog.ErrorContext(ctx, "failed to start new activity", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}

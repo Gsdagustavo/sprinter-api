@@ -19,11 +19,11 @@ type activityUseCases struct {
 	repository repositories.ActivityRepository
 }
 
-func (u activityUseCases) StartActivity(ctx context.Context, activity entities.Activity) (int64, error) {
-	err := rules.ValidateActivityStart(&activity)
+func (u activityUseCases) StartActivity(ctx context.Context, activity *entities.Activity) (int64, error) {
+	err := rules.ValidateActivityStart(activity)
 	if err != nil {
 		return 0, err
 	}
 
-	return u.repository.StartActivity(ctx, activity)
+	return u.repository.StartActivity(ctx, *activity)
 }

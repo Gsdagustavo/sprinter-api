@@ -11,6 +11,6 @@ type ActivityUseCase interface {
 	// StartActivity attempts to start a new activity with the given information
 	StartActivity(
 		ctx context.Context,
-		activity entities.Activity,
+		activity *entities.Activity,
 	) (int64, error)
 }
