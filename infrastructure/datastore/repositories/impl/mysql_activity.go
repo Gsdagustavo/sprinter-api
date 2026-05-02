@@ -26,19 +26,13 @@ func (r activityRepository) AddNewActivity(
 	activity entities.Activity,
 ) (int64, error) {
 	const query = `
-INSERT INTO activities (
-    uuid,
-    user_id,
-    type,
-    start_time,
-    end_time
-) VALUES (
-    ?,  
-    ?,  
-    ?,  
-    ?,  
-    ?   
-)
+	INSERT INTO activities (
+		uuid,
+		user_id,
+		type,
+		start_time,
+		end_time) 
+	VALUES (?, ?, ?, ?, ?)
 `
 
 	res, err := r.conn.ExecContext(

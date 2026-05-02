@@ -42,7 +42,7 @@ func (m activityModule) Routes() []router.RouteDefinition {
 			Path:        "",
 			Description: "Add new activity",
 			Handler:     m.addNewActivity,
-			HttpMethods: []string{http.MethodPut},
+			HttpMethods: []string{http.MethodPost},
 			Public:      false,
 		},
 	}
@@ -79,7 +79,7 @@ func (m activityModule) addNewActivity(w http.ResponseWriter, r *http.Request) {
 	response, err := m.activityUseCases.AddNewActivity(ctx, activity)
 
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to update user information", logger.Err(err))
+		slog.ErrorContext(ctx, "failed to add new activity", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}

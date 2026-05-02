@@ -8,7 +8,7 @@ import (
 
 // ActivityRepository defines methods for managing activities
 type ActivityRepository interface {
-	//	AddNewActivity tries to add a new activity with the given information
+	// AddNewActivity tries to add a new activity with the given information
 	AddNewActivity(
 		ctx context.Context,
 		activity entities.Activity,
