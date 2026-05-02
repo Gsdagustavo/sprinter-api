@@ -77,7 +77,6 @@ func (m activityModule) startActivity(w http.ResponseWriter, r *http.Request) {
 
 	activity.UserID = user.ID
 	response, err := m.activityUseCases.StartActivity(ctx, activity)
-
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to add new activity", logger.Err(err))
 		router.HandleError(w, err)

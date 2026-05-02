@@ -44,10 +44,10 @@ CREATE TABLE activities (
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             user_id INT NOT NULL,
                             type INT NOT NULL,
-                            start_date DATETIME,
-                            end_date DATETIME,
-                            created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                            modified_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(6),
+                            start_date DATETIME NOT NULL,
+                            end_date DATETIME NULL,
+                            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                             INDEX idx_user_id (user_id)
 );
 
@@ -56,8 +56,8 @@ CREATE TABLE points (
                         activity_id INT NOT NULL,
                         latitude DOUBLE NOT NULL,
                         longitude DOUBLE NOT NULL,
-                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-                        modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         CONSTRAINT fk_points_activity
                             FOREIGN KEY (activity_id)
                                 REFERENCES activities(id)

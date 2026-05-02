@@ -30,7 +30,7 @@ func (r activityRepository) StartActivity(
 		user_id,
 		type,
 	    start_date,
-	VALUES ( ?, ?, ?)
+	VALUES (?, ?, ?)
 `
 
 	res, err := r.conn.ExecContext(

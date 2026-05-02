@@ -21,17 +21,17 @@ type Activity struct {
 	Type ActivityType `json:"type,omitempty"`
 
 	// Route is the track of the activity
-	Route *[]Point `json:"route,omitempty"`
+	Route []Point `json:"route,omitempty"`
 
-	// StartDate is the time that the activity has started
-	StartDate time.Time `json:"start_time,omitempty"`
+	// StartDate is the date that the activity has started
+	StartDate time.Time `json:"start_date,omitempty"`
 
-	// EndDate is the time that the activity has ended
-	EndDate *time.Time `json:"end_time,omitempty"`
+	// EndDate is the date that the activity has ended
+	EndDate time.Time `json:"end_date,omitempty"`
 
 	// CreatedAt is the time that the field was created at the database
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
 
 	// ModifiedAt is the time that the field has been modified in the database
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	ModifiedAt time.Time `json:"modified_at,omitempty"`
 }

@@ -30,6 +30,6 @@ var (
 )
 
 var (
-	InvalidActivityType     = NewClientError("INVALID_ACTIVITY_TYPE", "Invalid activity type")
-	InvalidActivityDuration = NewClientError("INVALID_ACTIVITY_DURATION", "Invalid activity duration")
+	InvalidActivityType      = NewClientError("INVALID_ACTIVITY_TYPE", "Invalid activity type")
+	InvalidActivityStartDate = NewClientError("INVALID_ACTIVITY_START_", "Invalid activity duration")
 )

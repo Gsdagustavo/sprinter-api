@@ -20,10 +20,10 @@ type activityUseCases struct {
 }
 
 func (u activityUseCases) StartActivity(ctx context.Context, activity entities.Activity) (int64, error) {
-	err := rules.ValidateActivity(&activity)
+	err := rules.ValidateActivityStart(&activity)
 	if err != nil {
 		return 0, err
 	}
 
-	return u.StartActivity(ctx, activity)
+	return u.repository.StartActivity(ctx, activity)
 }
