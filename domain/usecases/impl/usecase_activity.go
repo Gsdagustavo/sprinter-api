@@ -34,10 +34,5 @@ func (u activityUseCases) FinishActivity(ctx context.Context, activity *entities
 		return 0, err
 	}
 
-	err = rules.ValidateActivityPoints(&activity.Route)
-	if err != nil {
-		return 0, err
-	}
-
 	return u.repository.FinishActivity(ctx, *activity)
 }
