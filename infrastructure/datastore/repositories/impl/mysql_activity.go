@@ -23,7 +23,7 @@ type activityRepository struct {
 
 func (r activityRepository) StartActivity(
 	ctx context.Context,
-	activity entities.Activity,
+	activity *entities.Activity,
 ) (int64, error) {
 	const query = `
 	INSERT INTO activities (
