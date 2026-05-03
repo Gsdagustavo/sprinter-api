@@ -39,7 +39,7 @@ func (m activityModule) Path() string {
 func (m activityModule) Routes() []router.RouteDefinition {
 	return []router.RouteDefinition{
 		{
-			Path:        "",
+			Path:        "/start",
 			Description: "Start new activity",
 			Handler:     m.startActivity,
 			HttpMethods: []string{http.MethodPost},
@@ -51,6 +51,7 @@ func (m activityModule) Routes() []router.RouteDefinition {
 func (m activityModule) Middlewares() []mux.MiddlewareFunc {
 	return []mux.MiddlewareFunc{}
 }
+
 func (m activityModule) startActivity(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, err := router.GetUser(r)

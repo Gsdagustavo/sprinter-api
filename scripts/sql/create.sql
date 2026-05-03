@@ -41,26 +41,25 @@ CREATE TABLE products
 );
 
 CREATE TABLE activities (
-                            id INT AUTO_INCREMENT PRIMARY KEY,
-                            user_id INT NOT NULL,
-                            type INT NOT NULL,
-                            start_date DATETIME NOT NULL,
-                            end_date DATETIME NULL,
-                            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                            modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                            INDEX idx_user_id (user_id)
+    id          INT PRIMARY KEY AUTO_INCREMENT,
+    id_user     INT      NOT NULL,
+    type        INT      NOT NULL,
+    start_date  DATETIME NOT NULL,
+    end_date    DATETIME NULL,
+    status_code INT      NOT NULL DEFAULT 0,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_id_user (id_user)
 );
 
 CREATE TABLE points (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        activity_id INT NOT NULL,
-                        latitude DOUBLE NOT NULL,
-                        longitude DOUBLE NOT NULL,
-                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        CONSTRAINT fk_points_activity
-                            FOREIGN KEY (activity_id)
-                                REFERENCES activities(id)
-                                ON DELETE CASCADE,
-                        INDEX idx_activity_id (activity_id)
+    id          INT PRIMARY KEY AUTO_INCREMENT,
+    id_activity INT NOT NULL,
+    latitude    DOUBLE NOT NULL,
+    longitude   DOUBLE NOT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_points_activity FOREIGN KEY (id_activity) REFERENCES activities(id) ON DELETE CASCADE,
+    INDEX idx_id_activity (id_activity)
 );

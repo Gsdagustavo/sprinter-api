@@ -25,5 +25,5 @@ func (u activityUseCases) StartActivity(ctx context.Context, activity *entities.
 		return 0, err
 	}
 
-	return u.repository.StartActivity(ctx, *activity)
+	return u.repository.StartActivity(ctx, activity)
 }
