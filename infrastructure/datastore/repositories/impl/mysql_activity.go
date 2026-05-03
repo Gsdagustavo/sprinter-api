@@ -22,8 +22,8 @@ type activityRepository struct {
 }
 
 func (r activityRepository) StartActivity(
-	ctx context.Context,
-	activity *entities.Activity,
+		ctx context.Context,
+		activity *entities.Activity,
 ) (int64, error) {
 	const query = `
 	INSERT INTO activities (
@@ -53,8 +53,8 @@ func (r activityRepository) StartActivity(
 }
 
 func (r activityRepository) FinishActivity(
-	ctx context.Context,
-	activity entities.Activity,
+		ctx context.Context,
+		activity entities.Activity,
 ) (int64, error) {
 	const query = `
 	UPDATE activities 
@@ -78,7 +78,7 @@ func (r activityRepository) FinishActivity(
 
 	return activity.ID, nil
 }
-func (u activityRepository) saveActivityPoints(ctx context.Context, points []entities.Point) ([]int64, error) {
+func (r activityRepository) saveActivityPoints(ctx context.Context, points []entities.Point) ([]int64, error) {
 	const query = `
 	INSERT INTO points (
 		activity_id,
@@ -89,7 +89,7 @@ func (u activityRepository) saveActivityPoints(ctx context.Context, points []ent
 
 	var pointsId []int64
 	for _, point := range points {
-		_, err := p.conn.ExecContext(
+		_, err := r.conn.ExecContext(
 			ctx,
 			query,
 			point.ActivityID,
