@@ -18,7 +18,17 @@ func ValidateActivityStart(activity *entities.Activity) error {
 	if activity.StartDate != time.Now() || activity.StartDate.IsZero() {
 		return derr.InvalidActivityStartDate
 	}
-	
+
 	return nil
 
+}
+func ValidateActivityFinish(activity *entities.Activity) error {
+	if len(activity.Route) == 1 {
+		return derr.InvalidActivityRoute
+	}
+
+	if activity.EndDate != time.Now() || activity.EndDate.IsZero() {
+		return derr.InvalidActivityEndDate
+	}
+	return nil
 }

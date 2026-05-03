@@ -16,7 +16,8 @@ func NewActivityUseCases(repository repositories.ActivityRepository) usecases.Ac
 }
 
 type activityUseCases struct {
-	repository repositories.ActivityRepository
+	repository      repositories.ActivityRepository
+	pointRepository repositories.PointRepository
 }
 
 func (u activityUseCases) StartActivity(ctx context.Context, activity *entities.Activity) (int64, error) {
@@ -26,4 +27,28 @@ func (u activityUseCases) StartActivity(ctx context.Context, activity *entities.
 	}
 
 	return u.repository.StartActivity(ctx, activity)
+}
+
+func (u activityUseCases) FinishActivity(ctx context.Context, activity *entities.Activity) (int64, error) {
+	err := rules.ValidateActivityFinish(activity)
+	if err != nil {
+		return 0, err
+	}
+
+	err = rules.ValidateActivityPoints(&activity.Route)
+	if err != nil {
+		return 0, err
+	}
+
+	activityId, err := u.repository.FinishActivity(ctx, *activity)
+	if err != nil {
+		return 0, err
+	}
+
+	_, err = u.pointRepository.SaveActivityPoints(ctx, activity.Route)
+	if err != nil {
+		return 0, err
+	}
+
+	return activityId, nil
 }

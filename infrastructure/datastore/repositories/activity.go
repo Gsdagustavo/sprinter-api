@@ -13,4 +13,10 @@ type ActivityRepository interface {
 		ctx context.Context,
 		activity *entities.Activity,
 	) (int64, error)
+
+	// FinishActivity tries to finish an existent activity with the given information
+	FinishActivity(
+		ctx context.Context,
+		activity entities.Activity,
+	) (int64, error)
 }

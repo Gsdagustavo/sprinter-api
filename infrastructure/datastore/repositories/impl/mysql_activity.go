@@ -23,15 +23,15 @@ type activityRepository struct {
 
 func (r activityRepository) StartActivity(
 	ctx context.Context,
-	activity *entities.Activity,
+	activity entities.Activity,
 ) (int64, error) {
 	const query = `
 	INSERT INTO activities (
 		user_id,
 		type,
-	    start_date
-	) VALUES (?, ?, ?)
-	`
+	    start_date,
+	VALUES (?, ?, ?)
+`
 
 	res, err := r.conn.ExecContext(
 		ctx,
@@ -41,13 +41,35 @@ func (r activityRepository) StartActivity(
 		activity.StartDate,
 	)
 	if err != nil {
-		return 0, derr.JoinError("failed to execute query", err)
+		return -1, derr.JoinError("failed to execute query", err)
 	}
 
 	activityID, err := res.LastInsertId()
 	if err != nil {
-		return 0, derr.JoinError("failed to get last inserted ID", err)
+		return -1, derr.JoinError("failed to get last inserted ID", err)
 	}
 
 	return activityID, nil
+}
+
+func (r activityRepository) FinishActivity(
+	ctx context.Context,
+	activity entities.Activity,
+) (int64, error) {
+	const query = `
+	UPDATE activities 
+	SET end_date = ?,
+	WHERE id = ?
+`
+	_, err := r.conn.ExecContext(
+		ctx,
+		query,
+		activity.EndDate,
+		activity.ID,
+	)
+	if err != nil {
+		return 0, derr.JoinError("failed to execute the query", err)
+	}
+
+	return activity.ID, nil
 }
