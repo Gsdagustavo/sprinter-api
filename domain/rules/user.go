@@ -92,7 +92,20 @@ func ValidateBiography(biography string) error {
 	return nil
 }
 
-func ValidateCredentials(credentials entities.UserCredentials) error {
+func ValidateRegisterCredentials(credentials entities.UserCredentials) error {
+	valid := ValidateEmail(credentials.Email)
+	if !valid {
+		return derr.InvalidEmail
+	}
+
+	err := ValidatePassword(credentials.Password)
+	if err != nil {
+		return derr.WeakPassword
+	}
+
+	return nil
+}
+func ValidateLoginCredentials(credentials entities.UserCredentials) error {
 	valid := ValidateEmail(credentials.Email)
 	if !valid {
 		return derr.InvalidEmail

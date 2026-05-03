@@ -21,16 +21,16 @@ import (
 )
 
 func NewAuthenticationUseCase(
-		repository repositories.AuthRepository,
-		securityKey string,
-		storage filestore.FileStorage,
-		mailSender mail.Sender,
+	repository repositories.AuthRepository,
+	securityKey string,
+	storage filestore.FileStorage,
+	mailSender mail.Sender,
 ) usecases.AuthenticationUseCase {
 	return authenticationUseCase{
 		repository:  repository,
 		securityKey: securityKey,
 		storage:     storage,
-		mailSender: mailSender,
+		mailSender:  mailSender,
 	}
 }
 
@@ -38,14 +38,15 @@ type authenticationUseCase struct {
 	repository  repositories.AuthRepository
 	securityKey string
 	storage     filestore.FileStorage
-	mailSender mail.Sender
+	mailSender  mail.Sender
 }
 
 func (a authenticationUseCase) AttemptLogin(
-		ctx context.Context,
-		credentials entities.UserCredentials,
+	ctx context.Context,
+	credentials entities.UserCredentials,
 ) (string, error) {
-	if err := rules.ValidateCredentials(credentials); err != nil {
+	err := rules.ValidateLoginCredentials(credentials)
+	if err != nil {
 		return "", derr.InvalidCredentials
 	}
 
@@ -76,10 +77,11 @@ func (a authenticationUseCase) AttemptLogin(
 }
 
 func (a authenticationUseCase) AttemptRegister(
-		ctx context.Context,
-		credentials entities.UserCredentials,
+	ctx context.Context,
+	credentials entities.UserCredentials,
 ) (string, error) {
-	if err := rules.ValidateCredentials(credentials); err != nil {
+	err := rules.ValidateRegisterCredentials(credentials)
+	if err != nil {
 		return "", err
 	}
 
@@ -127,22 +129,22 @@ func (a authenticationUseCase) AttemptRegister(
 }
 
 func (a authenticationUseCase) GetUserByEmail(
-		ctx context.Context,
-		email string,
+	ctx context.Context,
+	email string,
 ) (*entities.User, error) {
 	return a.repository.GetUserByEmail(ctx, email)
 }
 
 func (a authenticationUseCase) CheckCredentials(
-		ctx context.Context,
-		credentials entities.UserCredentials,
+	ctx context.Context,
+	credentials entities.UserCredentials,
 ) (bool, error) {
 	return a.repository.CheckUserCredentials(ctx, credentials)
 }
 
 func (a authenticationUseCase) GetUserByToken(
-		ctx context.Context,
-		token string,
+	ctx context.Context,
+	token string,
 ) (*entities.User, error) {
 	id, expired, err := util.GetUserIDFromToken(token, a.securityKey)
 	if err != nil {
@@ -157,14 +159,15 @@ func (a authenticationUseCase) GetUserByToken(
 }
 
 func (a authenticationUseCase) AttemptCompleteRegistration(
-		ctx context.Context,
-		information entities.UserInformation,
+	ctx context.Context,
+	information entities.UserInformation,
 ) error {
 	information.Username = strings.TrimSpace(information.Username)
 	information.Biography = strings.TrimSpace(information.Biography)
 
 	var err error
-	if err = rules.ValidateName(information.Username); err != nil {
+	err = rules.ValidateName(information.Username)
+	if err != nil {
 		return err
 	}
 
@@ -181,9 +184,9 @@ func (a authenticationUseCase) AttemptCompleteRegistration(
 }
 
 func (a authenticationUseCase) UploadProfileImage(
-		_ context.Context,
-		userID int64,
-		image []byte,
+	_ context.Context,
+	userID int64,
+	image []byte,
 ) error {
 	const profileFolderPath = "/user/profile"
 
