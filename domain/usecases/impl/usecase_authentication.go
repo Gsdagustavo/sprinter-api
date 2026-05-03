@@ -47,7 +47,7 @@ func (a authenticationUseCase) AttemptLogin(
 ) (string, error) {
 	err := rules.ValidateLoginCredentials(credentials)
 	if err != nil {
-		return "", derr.InvalidCredentials
+		return "", err
 	}
 
 	userByEmail, err := a.repository.GetUserByEmail(ctx, credentials.Email)
@@ -165,13 +165,8 @@ func (a authenticationUseCase) AttemptCompleteRegistration(
 	information.Username = strings.TrimSpace(information.Username)
 	information.Biography = strings.TrimSpace(information.Biography)
 
-	var err error
-	err = rules.ValidateName(information.Username)
+	err := rules.ValidateUserInformation(information)
 	if err != nil {
-		return err
-	}
-
-	if err = rules.ValidateBiography(information.Biography); err != nil {
 		return err
 	}
 

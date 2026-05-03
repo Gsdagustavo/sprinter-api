@@ -15,6 +15,7 @@ var (
 )
 
 var (
+	InvalidName        = NewClientError("INVALID_NAME", "Invalid name")
 	InvalidUsername    = NewClientError("INVALID_USERNAME", "Invalid username")
 	BiographyIsTooLong = NewClientError("BIOGRAPHY_IS_TOO_LONG", "Biography is too long")
 	NameIsTooShort     = NewClientError("NAME_IS_TOO_SHORT", "Name is too short")

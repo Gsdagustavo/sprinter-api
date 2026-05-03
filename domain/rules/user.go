@@ -48,7 +48,7 @@ func ValidateEmail(email string) bool {
 	return err == nil && res.Address == email
 }
 
-func ValidatePassword(password string) error {
+func ValidatePassword(password string) bool {
 	var letters int
 	var number bool
 	var special bool
@@ -66,10 +66,10 @@ func ValidatePassword(password string) error {
 
 	strong := letters >= PasswordMinLetters && letters <= PasswordMaxLetters && number && special
 	if !strong {
-		return derr.WeakPassword
+		return false
 	}
 
-	return nil
+	return true
 }
 
 func ValidateName(name string) error {
@@ -93,13 +93,18 @@ func ValidateBiography(biography string) error {
 }
 
 func ValidateRegisterCredentials(credentials entities.UserCredentials) error {
+	err := ValidateName(credentials.Name)
+	if err != nil {
+		return derr.InvalidName
+	}
+
 	valid := ValidateEmail(credentials.Email)
 	if !valid {
 		return derr.InvalidEmail
 	}
 
-	err := ValidatePassword(credentials.Password)
-	if err != nil {
+	valid = ValidatePassword(credentials.Password)
+	if !valid {
 		return derr.WeakPassword
 	}
 
@@ -111,8 +116,8 @@ func ValidateLoginCredentials(credentials entities.UserCredentials) error {
 		return derr.InvalidEmail
 	}
 
-	err := ValidatePassword(credentials.Password)
-	if err != nil {
+	valid = ValidatePassword(credentials.Password)
+	if valid {
 		return derr.InvalidPassword
 	}
 
