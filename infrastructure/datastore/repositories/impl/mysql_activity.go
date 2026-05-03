@@ -29,8 +29,8 @@ func (r activityRepository) StartActivity(
 	INSERT INTO activities (
 		id_user,
 		type,
-	    start_date,
-	VALUES (?, ?, ?)
+	    start_date
+	) VALUES (?, ?, ?)
 	`
 
 	res, err := r.conn.ExecContext(

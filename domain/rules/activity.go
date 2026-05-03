@@ -30,6 +30,7 @@ func ValidateActivityFinish(activity *entities.Activity) error {
 	if activity.EndDate != time.Now() || activity.EndDate.IsZero() {
 		return derr.InvalidActivityEndDate
 	}
+
 	for _, point := range activity.Route {
 		if point.Latitude == 0 || point.Longitude == 0 {
 			return derr.InvalidActivityPoint
