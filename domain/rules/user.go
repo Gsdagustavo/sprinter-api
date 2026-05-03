@@ -29,26 +29,24 @@ const (
 	BiographyMaxLetters = 100
 )
 
-func ValidateUserInformation(userInformation entities.UserInformation) error {
-	err := ValidateName(userInformation.Username)
-	if err != nil {
-		return err
+func validateName(name string) error {
+	if len(name) < NameMinLetters {
+		return derr.NameIsTooShort
 	}
 
-	err = ValidateBiography(userInformation.Biography)
-	if err != nil {
-		return err
+	if len(name) > NameMaxLetters {
+		return derr.NameIsTooLong
 	}
 
 	return nil
 }
 
-func ValidateEmail(email string) bool {
+func validateEmail(email string) bool {
 	res, err := mail.ParseAddress(email)
 	return err == nil && res.Address == email
 }
 
-func ValidatePassword(password string) bool {
+func validatePassword(password string) bool {
 	var letters int
 	var number bool
 	var special bool
@@ -72,19 +70,7 @@ func ValidatePassword(password string) bool {
 	return true
 }
 
-func ValidateName(name string) error {
-	if len(name) < NameMinLetters {
-		return derr.NameIsTooShort
-	}
-
-	if len(name) > NameMaxLetters {
-		return derr.NameIsTooLong
-	}
-
-	return nil
-}
-
-func ValidateBiography(biography string) error {
+func validateBiography(biography string) error {
 	if len(biography) > BiographyMaxLetters {
 		return derr.BiographyIsTooLong
 	}
@@ -92,32 +78,47 @@ func ValidateBiography(biography string) error {
 	return nil
 }
 
-func ValidateRegisterCredentials(credentials entities.UserCredentials) error {
-	err := ValidateName(credentials.Name)
+func ValidateUserInformation(userInformation entities.UserInformation) error {
+	err := validateName(userInformation.Username)
 	if err != nil {
-		return derr.InvalidName
+		return err
 	}
 
-	valid := ValidateEmail(credentials.Email)
+	err = validateBiography(userInformation.Biography)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ValidateRegisterCredentials(credentials entities.UserCredentials) error {
+	err := validateName(credentials.Name)
+	if err != nil {
+		return err
+	}
+
+	valid := validateEmail(credentials.Email)
 	if !valid {
 		return derr.InvalidEmail
 	}
 
-	valid = ValidatePassword(credentials.Password)
+	valid = validatePassword(credentials.Password)
 	if !valid {
 		return derr.WeakPassword
 	}
 
 	return nil
 }
+
 func ValidateLoginCredentials(credentials entities.UserCredentials) error {
-	valid := ValidateEmail(credentials.Email)
-	if !valid {
+	emailValid := validateEmail(credentials.Email)
+	if !emailValid {
 		return derr.InvalidEmail
 	}
 
-	valid = ValidatePassword(credentials.Password)
-	if valid {
+	passwordValid := validatePassword(credentials.Password)
+	if !passwordValid {
 		return derr.InvalidPassword
 	}
 

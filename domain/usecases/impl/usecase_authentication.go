@@ -56,7 +56,7 @@ func (a authenticationUseCase) AttemptLogin(
 	}
 
 	if userByEmail == nil {
-		return "", derr.InvalidCredentials
+		return "", derr.NotFoundError
 	}
 
 	valid, err := a.repository.CheckUserCredentials(ctx, credentials)
