@@ -34,8 +34,5 @@ var (
 	InvalidActivityStartDate = NewClientError("INVALID_ACTIVITY_START_DATE", "Invalid activity start date")
 	InvalidActivityEndDate   = NewClientError("INVALID_ACTIVITY_END_DATE", "Invalid activity end date")
 	InvalidActivityRoute     = NewClientError("INVALID_ACTIVITY_ROUTE", "Invalid activity route")
-)
-
-var (
-	InvalidGeoPoint = NewClientError("INVALID_GEO_POINT", "Invalid geo point")
+	InvalidActivityPoint     = NewClientError("INVALID_ACTIVITY_POINT", "Invalid activity point")
 )

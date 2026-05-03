@@ -23,12 +23,13 @@ func ValidateActivityStart(activity *entities.Activity) error {
 
 }
 func ValidateActivityFinish(activity *entities.Activity) error {
-	if len(activity.Route) == 1 {
+	if len(activity.Route) == 0 {
 		return derr.InvalidActivityRoute
 	}
 
 	if activity.EndDate != time.Now() || activity.EndDate.IsZero() {
 		return derr.InvalidActivityEndDate
 	}
+	
 	return nil
 }

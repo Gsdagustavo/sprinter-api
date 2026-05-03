@@ -45,6 +45,13 @@ func (m activityModule) Routes() []router.RouteDefinition {
 			HttpMethods: []string{http.MethodPost},
 			Public:      false,
 		},
+		{
+			Path:        "/finish",
+			Description: "Finish an existent activity",
+			Handler:     m.startActivity,
+			HttpMethods: []string{http.MethodPut},
+			Public:      false,
+		},
 	}
 }
 
@@ -80,6 +87,37 @@ func (m activityModule) startActivity(w http.ResponseWriter, r *http.Request) {
 	response, err := m.activityUseCases.StartActivity(ctx, activity)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to start new activity", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	err = router.Write(w, response)
+	if err != nil {
+		slog.ErrorContext(ctx, "Failed to write response", logger.Err(err))
+	}
+}
+
+func (m activityModule) finishActivity(w http.ResponseWriter, r http.Request) {
+	ctx := r.Context()
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to read body", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	var activity *entities.Activity
+	err = json.Unmarshal(body, &activity)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to unmarshal request body", logger.Err(err))
+		router.HandleError(w, derr.BadRequestError)
+		return
+	}
+
+	response, err := m.activityUseCases.FinishActivity(ctx, activity)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to finish the activity", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}

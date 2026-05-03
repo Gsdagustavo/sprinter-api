@@ -68,8 +68,39 @@ func (r activityRepository) FinishActivity(
 		activity.ID,
 	)
 	if err != nil {
-		return 0, derr.JoinError("failed to execute the query", err)
+		return -1, derr.JoinError("failed to execute the query", err)
+	}
+
+	_, err = r.saveActivityPoints(ctx, activity.Route)
+	if err != nil {
+		return -1, err
 	}
 
 	return activity.ID, nil
+}
+func (u activityRepository) saveActivityPoints(ctx context.Context, points []entities.Point) ([]int64, error) {
+	const query = `
+	INSERT INTO points (
+		activity_id,
+		latitude,
+	    longitude)       
+	VALUES (?, ?, ?)
+`
+
+	var pointsId []int64
+	for _, point := range points {
+		_, err := p.conn.ExecContext(
+			ctx,
+			query,
+			point.ActivityID,
+			point.Latitude,
+			point.Longitude,
+		)
+		if err != nil {
+			return []int64{}, derr.JoinError("failed to insert the point on the database", err)
+		}
+		pointsId = append(pointsId, point.ID)
+	}
+
+	return pointsId, nil
 }
