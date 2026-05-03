@@ -27,11 +27,11 @@ func (r activityRepository) StartActivity(
 ) (int64, error) {
 	const query = `
 	INSERT INTO activities (
-		user_id,
+		id_user,
 		type,
 	    start_date,
 	VALUES (?, ?, ?)
-`
+	`
 
 	res, err := r.conn.ExecContext(
 		ctx,
@@ -41,12 +41,12 @@ func (r activityRepository) StartActivity(
 		activity.StartDate,
 	)
 	if err != nil {
-		return -1, derr.JoinError("failed to execute query", err)
+		return 0, derr.JoinError("failed to execute query", err)
 	}
 
 	activityID, err := res.LastInsertId()
 	if err != nil {
-		return -1, derr.JoinError("failed to get last inserted ID", err)
+		return 0, derr.JoinError("failed to get last inserted ID", err)
 	}
 
 	return activityID, nil
@@ -54,42 +54,53 @@ func (r activityRepository) StartActivity(
 
 func (r activityRepository) FinishActivity(
 	ctx context.Context,
-	activity entities.Activity,
+	activity *entities.Activity,
 ) (int64, error) {
 	const query = `
-	UPDATE activities 
-	SET end_date = ?,
+	UPDATE activities SET 
+	    end_date = ?
 	WHERE id = ?
-`
-	_, err := r.conn.ExecContext(
+	`
+
+	tx, err := r.conn.BeginTx(ctx, nil)
+	if err != nil {
+		return 0, derr.JoinError("failed to begin transaction", err)
+	}
+
+	_, err = tx.ExecContext(
 		ctx,
 		query,
 		activity.EndDate,
 		activity.ID,
 	)
 	if err != nil {
-		return -1, derr.JoinError("failed to execute the query", err)
+		return 0, derr.JoinError("failed to execute the query", err)
 	}
 
-	_, err = r.saveActivityPoints(ctx, activity.Route)
+	err = r.saveActivityPoints(ctx, tx, activity.Route)
 	if err != nil {
-		return -1, err
+		return 0, derr.JoinError("failed to save activity points", err)
 	}
 
 	return activity.ID, nil
 }
-func (r activityRepository) saveActivityPoints(ctx context.Context, points []entities.Point) ([]int64, error) {
+func (r activityRepository) saveActivityPoints(ctx context.Context, tx *sql.Tx, points []entities.Point) error {
 	const query = `
 	INSERT INTO points (
-		activity_id,
+		id_activity,
 		latitude,
-	    longitude)       
-	VALUES (?, ?, ?)
-`
+	    longitude
+	) VALUES (?, ?, ?)
+	`
 
-	var pointsId []int64
+	stmt, err := tx.PrepareContext(ctx, query)
+	if err != nil {
+		return derr.JoinError("failed to prepare statement", err)
+	}
+	defer stmt.Close()
+
 	for _, point := range points {
-		_, err := r.conn.ExecContext(
+		_, err := stmt.ExecContext(
 			ctx,
 			query,
 			point.ActivityID,
@@ -97,10 +108,9 @@ func (r activityRepository) saveActivityPoints(ctx context.Context, points []ent
 			point.Longitude,
 		)
 		if err != nil {
-			return []int64{}, derr.JoinError("failed to insert the point on the database", err)
+			return derr.JoinError("failed to execute query", err)
 		}
-		pointsId = append(pointsId, point.ID)
 	}
 
-	return pointsId, nil
+	return nil
 }

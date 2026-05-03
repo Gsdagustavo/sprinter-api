@@ -34,5 +34,5 @@ func (u activityUseCases) FinishActivity(ctx context.Context, activity *entities
 		return 0, err
 	}
 
-	return u.repository.FinishActivity(ctx, *activity)
+	return u.repository.FinishActivity(ctx, activity)
 }

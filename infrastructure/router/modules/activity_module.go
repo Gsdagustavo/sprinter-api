@@ -48,7 +48,7 @@ func (m activityModule) Routes() []router.RouteDefinition {
 		{
 			Path:        "/finish",
 			Description: "Finish an existent activity",
-			Handler:     m.startActivity,
+			Handler:     m.finishActivity,
 			HttpMethods: []string{http.MethodPut},
 			Public:      false,
 		},
@@ -97,7 +97,7 @@ func (m activityModule) startActivity(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (m activityModule) finishActivity(w http.ResponseWriter, r http.Request) {
+func (m activityModule) finishActivity(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	body, err := io.ReadAll(r.Body)
@@ -117,7 +117,7 @@ func (m activityModule) finishActivity(w http.ResponseWriter, r http.Request) {
 
 	response, err := m.activityUseCases.FinishActivity(ctx, activity)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to finish the activity", logger.Err(err))
+		slog.ErrorContext(ctx, "failed to finish activity", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}
