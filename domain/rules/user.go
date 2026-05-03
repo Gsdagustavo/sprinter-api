@@ -93,12 +93,14 @@ func ValidateBiography(biography string) error {
 }
 
 func ValidateCredentials(credentials entities.UserCredentials) error {
-	if valid := ValidateEmail(credentials.Email); !valid {
+	valid := ValidateEmail(credentials.Email)
+	if !valid {
 		return derr.InvalidEmail
 	}
 
-	if err := ValidatePassword(credentials.Password); err != nil {
-		return derr.WeakPassword
+	err := ValidatePassword(credentials.Password)
+	if err != nil {
+		return derr.InvalidPassword
 	}
 
 	return nil
