@@ -31,12 +31,12 @@ func Start() error {
 
 	err = infrastructure.SetupModules(router, settings)
 	if err != nil {
-		return errorsderr.JoinError("failed to setup infrastructure", err)
+		return derr.JoinError("failed to setup infrastructure", err)
 	}
 
 	err = logger.SetupLogger(settings)
 	if err != nil {
-		return errorsderr.JoinError("failed to setup logger", errr)
+		return derr.JoinError("failed to setup logger", err)
 	}
 
 	srv := &http.Server{
