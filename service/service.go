@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/gorilla/handlers"
@@ -43,12 +44,12 @@ func NewService(settings entities.Settings, settingsPath string) (service.Servic
 
 	s, err := service.New(prg, svcConfig)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to create service"), err)
+		return nil, derr.JoinError("failed to create service", err)
 	}
 
 	_, err = s.Logger(nil)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to set logger"), err)
+		return nil, derr.JoinError("failed to set logger", err)
 	}
 
 	return s, nil

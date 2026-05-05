@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/gorilla/handlers"
@@ -22,7 +23,7 @@ import (
 func Start() error {
 	settings, err := loadSettingsFromEnv()
 	if err != nil {
-		return errors.Join(errors.New("failed to load settings from environment variables"), err)
+		return derr.JoinError("failed to load settings from environment variables", err)
 	}
 
 	// Order the modules
@@ -30,12 +31,12 @@ func Start() error {
 
 	err = infrastructure.SetupModules(router, settings)
 	if err != nil {
-		return errors.Join(errors.New("failed to setup infrastructure"), err)
+		return errorsderr.JoinError("failed to setup infrastructure", err)
 	}
 
 	err = logger.SetupLogger(settings)
 	if err != nil {
-		return errors.Join(errors.New("failed to setup logger"), err)
+		return errorsderr.JoinError("failed to setup logger", errr)
 	}
 
 	srv := &http.Server{
@@ -59,7 +60,7 @@ func Start() error {
 func requireEnv(key string) (string, error) {
 	v := os.Getenv(key)
 	if v == "" {
-		return "", errors.Join(fmt.Errorf("env %q is required but not set", key))
+		return "", fmt.Errorf("env %q is required but not set", key)
 	}
 	return v, nil
 }
@@ -74,7 +75,7 @@ func optionalEnv(key, defaultValue string) string {
 func requireEnvInt(key string) (int, error) {
 	raw, err := requireEnv(key)
 	if err != nil {
-		return 0, errors.Join(errors.New("failed to read env as int"), err)
+		return 0, derr.JoinError("failed to read env as int", err)
 	}
 	v, err := strconv.Atoi(raw)
 	if err != nil {

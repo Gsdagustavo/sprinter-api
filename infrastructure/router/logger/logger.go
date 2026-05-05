@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	slogzap "github.com/samber/slog-zap/v2"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -64,7 +65,7 @@ func CreateLogHandler(outPath string, settings entities.Settings) (slog.Handler,
 
 		zapLogger, err := zapLoggerConfig.Build()
 		if err != nil {
-			return nil, errors.Join(errors.New("failed to build production logger"), err)
+			return nil, derr.JoinError("failed to build production logger", err)
 		}
 
 		zapOptions := slogzap.Option{
@@ -93,7 +94,7 @@ func CreateLogHandler(outPath string, settings entities.Settings) (slog.Handler,
 		if outPath != "" {
 			f, err := os.OpenFile(outPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 			if err != nil {
-				return nil, fmt.Errorf("failed to open log file: %w", err)
+				return nil, derr.JoinError("failed to open log file", err)
 			}
 
 			cores = append(cores, zapcore.NewCore(fileEncoder, zapcore.AddSync(f), zapcore.DebugLevel))
@@ -123,21 +124,21 @@ func SetupLogger(settings entities.Settings) error {
 	if serverLogs != "" {
 		err := os.MkdirAll(filepath.Dir(serverLogs), 0755)
 		if err != nil {
-			return errors.Join(errors.New("failed to create log dir"), err)
+			return derr.JoinError("failed to create log dir", err)
 		}
 	}
 
 	if httpLogs != "" {
 		err := os.MkdirAll(filepath.Dir(httpLogs), 0755)
 		if err != nil {
-			return errors.Join(errors.New("failed to create http log dir"), err)
+			return derr.JoinError("failed to create http log dir", err)
 		}
 	}
 
 	// Initialize the log handler
 	logHandler, err := CreateLogHandler(serverLogs, settings)
 	if err != nil {
-		return errors.Join(errors.New("failed to create log handler"), err)
+		return derr.JoinError("failed to create log handler", err)
 	}
 
 	// Wrap with the context handler to always process the context variables in the log.

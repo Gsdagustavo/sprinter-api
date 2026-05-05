@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
+	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
 	"github.com/Gsdagustavo/sprinter-api/infrastructure/router/logger"
 	"github.com/Gsdagustavo/sprinter-api/service"
 	"gopkg.in/yaml.v3"
@@ -26,24 +27,24 @@ func Start() error {
 
 	configsFile, err := os.Open(cggPath)
 	if err != nil {
-		return errors.Join(errors.New("failed to open configs file"), err)
+		return derr.JoinError("failed to open configs file", err)
 	}
 	defer configsFile.Close()
 
 	var settings entities.Settings
 	err = yaml.NewDecoder(configsFile).Decode(&settings)
 	if err != nil {
-		return errors.Join(errors.New("failed to decode configs file"), err)
+		return derr.JoinError("failed to decode configs file", err)
 	}
 
 	err = logger.SetupLogger(settings)
 	if err != nil {
-		return errors.Join(errors.New("failed to setup logger"), err)
+		return derr.JoinError("failed to setup logger", err)
 	}
 
 	s, err := service.NewService(settings, cggPath)
 	if err != nil {
-		return errors.Join(errors.New("failed to create service"), err)
+		return derr.JoinError("failed to create service", err)
 	}
 
 	switch action {
@@ -52,7 +53,7 @@ func Start() error {
 
 		err = s.Run()
 		if err != nil {
-			return errors.Join(errors.New("failed to run service"), err)
+			return derr.JoinError("failed to run service", err)
 		}
 
 		return nil
@@ -62,7 +63,7 @@ func Start() error {
 
 		err = s.Uninstall()
 		if err != nil {
-			return errors.Join(errors.New("failed to uninstall service"), err)
+			return derr.JoinError("failed to uninstall service", err)
 		}
 
 	case "install":
@@ -70,7 +71,7 @@ func Start() error {
 
 		err = s.Install()
 		if err != nil {
-			return errors.Join(errors.New("failed to install service"), err)
+			return derr.JoinError("failed to install service", err)
 		}
 
 	case "stop":
@@ -78,7 +79,7 @@ func Start() error {
 
 		err = s.Stop()
 		if err != nil {
-			return errors.Join(errors.New("failed to stop service"), err)
+			return derr.JoinError("failed to stop service", err)
 		}
 	}
 
