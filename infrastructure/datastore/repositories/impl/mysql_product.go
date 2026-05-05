@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
 	"github.com/Gsdagustavo/sprinter-api/domain/entities/derr"
@@ -22,21 +23,25 @@ type productRepository struct {
 	settings repositories.SettingsRepository
 }
 
-func (r productRepository) AddNewProduct(ctx context.Context, product *entities.Product) (int64, error) {
-	const query = `
-	INSERT INTO products (
-					  name,
-                      description,
-                      price,
-                      stock,
-					  image_url
-                      )
-	VALUES (?, ?, ?, ?, ?)
-	`
+//go:embed _query/product/addNewProduct.sql
+var addNewProductQuery string
 
+//go:embed _query/product/deleteProduct.sql
+var deleteProductQuery string
+
+//go:embed _query/product/updateProduct.sql
+var updateProductQuery string
+
+//go:embed _query/product/getProductById.sql
+var getProductQuery string
+
+//go:embed _query/product/getProducts.sql
+var getProductsQuery string
+
+func (r productRepository) AddNewProduct(ctx context.Context, product *entities.Product) (int64, error) {
 	res, err := r.conn.ExecContext(
 		ctx,
-		query,
+		addNewProductQuery,
 		&product.Name,
 		&product.Description,
 		&product.Price,
@@ -56,9 +61,7 @@ func (r productRepository) AddNewProduct(ctx context.Context, product *entities.
 }
 
 func (r productRepository) DeleteProduct(ctx context.Context, id int64) error {
-	const query = `UPDATE products SET status_code = 1 WHERE id = ?`
-
-	res, err := r.conn.ExecContext(ctx, query, id)
+	res, err := r.conn.ExecContext(ctx, deleteProductQuery, id)
 	if err != nil {
 		return derr.JoinError("failed to execute query", err)
 	}
@@ -76,17 +79,7 @@ func (r productRepository) DeleteProduct(ctx context.Context, id int64) error {
 }
 
 func (r productRepository) UpdateProduct(ctx context.Context, product *entities.Product) error {
-	const query = `
-	UPDATE products
-	SET name = ?,
-		description = ?,
-		price = ?,
-		stock = ?,
-		image_url = ?
-	WHERE id = ?
-	`
-
-	result, err := r.conn.ExecContext(ctx, query, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Stock, product.ID)
+	result, err := r.conn.ExecContext(ctx, updateProductQuery, &product.Name, &product.Description, &product.ImageURL, &product.Price, &product.Stock, product.ID)
 	if err != nil {
 		return derr.JoinError("failed to execute query", err)
 	}
@@ -104,19 +97,8 @@ func (r productRepository) UpdateProduct(ctx context.Context, product *entities.
 }
 
 func (r productRepository) GetProductByID(ctx context.Context, id int64) (*entities.Product, error) {
-	const query = `
-	SELECT id,
-		   name,
-		   description,
-		   price,
-		   stock,
-		   image_url
-	FROM products
-	WHERE id = ? AND status_code = 0
-	`
-
 	var product entities.Product
-	err := r.conn.QueryRowContext(ctx, query, id).Scan(
+	err := r.conn.QueryRowContext(ctx, getUserByIdQuery, id).Scan(
 		&product.ID,
 		&product.Name,
 		&product.Description,
@@ -132,36 +114,24 @@ func (r productRepository) GetProductByID(ctx context.Context, id int64) (*entit
 }
 
 func (r productRepository) GetProducts(
-		ctx context.Context,
-		filter entities.GeneralFilter,
+	ctx context.Context,
+	filter entities.GeneralFilter,
 ) (*entities.PaginatedList[entities.Product], error) {
-	query := `
-	SELECT
-		id,
-		name,
-		description,
-		price,
-		stock,
-		image_url
-	FROM products
-	WHERE status_code = 0
-	`
-
 	ordination := filter.Ordination
 	switch filter.OrderBy {
 	case "name":
-		query += " ORDER BY name " + ordination
+		getProductsQuery += " ORDER BY name " + ordination
 	case "price":
-		query += " ORDER BY price " + ordination
+		getProductsQuery += " ORDER BY price " + ordination
 	case "stock":
-		query += " ORDER BY stock " + ordination
+		getProductsQuery += " ORDER BY stock " + ordination
 	}
 
-	query = datastore.GetPaginated(query, filter)
+	getProductsQuery = datastore.GetPaginated(getProductsQuery, filter)
 
-	rows, err := r.conn.QueryContext(ctx, query)
+	rows, err := r.conn.QueryContext(ctx, getProductsQuery)
 	if err != nil {
-		return nil, derr.JoinError("failed to query", err)
+		return nil, derr.JoinError("failed to execute query", err)
 	}
 	defer rows.Close()
 
@@ -183,7 +153,7 @@ func (r productRepository) GetProducts(
 		products = append(products, product)
 	}
 
-	countQuery := datastore.GetQueryCount(query)
+	countQuery := datastore.GetQueryCount(getProductsQuery)
 
 	var totalCount int64
 	err = r.conn.QueryRowContext(ctx, countQuery).Scan(&totalCount)
