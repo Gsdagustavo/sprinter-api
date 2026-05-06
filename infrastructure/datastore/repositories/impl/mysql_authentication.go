@@ -24,27 +24,27 @@ type authenticationRepository struct {
 	settings repositories.SettingsRepository
 }
 
-//go:embed _query/auth/getUserByEmail.sql
-var getUserByEmailQuery string
+//go:embed _query/auth/get_user_by_email.sql
+var getUserByEmail string
 
-//go:embed _query/auth/attemptRegister.sql
-var attemptRegisterQuery string
+//go:embed _query/auth/attempt_register.sql
+var attemptRegister string
 
-//go:embed _query/auth/checkUserCredential.sql
-var checkUserCredentialQuery string
+//go:embed _query/auth/check_user_credential.sql
+var checkUserCredential string
 
-//go:embed _query/auth/getUserById.sql
-var getUserByIdQuery string
+//go:embed _query/auth/get_user_by_id.sql
+var getUserById string
 
-//go:embed _query/auth/attemptCompleteRegister.sql
-var attemptCompleteRegisterQuery string
+//go:embed _query/auth/attempt_complete_register.sql
+var attemptCompleteRegister string
 
 func (r authenticationRepository) GetUserByEmail(
 	ctx context.Context,
 	email string,
 ) (*entities.User, error) {
 	var user entities.User
-	row := r.conn.QueryRowContext(ctx, getUserByEmailQuery, email)
+	row := r.conn.QueryRowContext(ctx, getUserByEmail, email)
 	err := row.Scan(
 		&user.ID,
 		&user.Name,
@@ -70,7 +70,7 @@ func (r authenticationRepository) AttemptRegister(
 ) (int64, error) {
 	result, err := r.conn.ExecContext(
 		ctx,
-		attemptRegisterQuery,
+		attemptRegister,
 		credentials.Name,
 		credentials.Email,
 		credentials.Password,
@@ -92,7 +92,7 @@ func (r authenticationRepository) CheckUserCredentials(
 	credentials entities.UserCredentials,
 ) (bool, error) {
 	var password string
-	err := r.conn.QueryRowContext(ctx, checkUserCredentialQuery, credentials.Email).Scan(&password)
+	err := r.conn.QueryRowContext(ctx, checkUserCredential, credentials.Email).Scan(&password)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, derr.NotFoundError
@@ -110,7 +110,7 @@ func (r authenticationRepository) GetUserByID(
 	userID int64,
 ) (*entities.User, error) {
 	var user entities.User
-	row := r.conn.QueryRowContext(ctx, getUserByIdQuery, userID)
+	row := r.conn.QueryRowContext(ctx, getUserById, userID)
 	err := row.Scan(
 		&user.ID,
 		&user.Name,
@@ -136,7 +136,7 @@ func (r authenticationRepository) AttemptCompleteRegistration(
 ) error {
 	_, err := r.conn.ExecContext(
 		ctx,
-		attemptCompleteRegisterQuery,
+		attemptCompleteRegister,
 		information.Username,
 		information.Biography,
 	)

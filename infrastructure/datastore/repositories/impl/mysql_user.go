@@ -25,11 +25,11 @@ type userRepository struct {
 	settings repositories.SettingsRepository
 }
 
-//go:embed _query/user/updateUserInformation.sql
-var updateUserInformationQuery string
+//go:embed _query/user/update_user_information.sql
+var updateUserInformation string
 
-//go:embed _query/user/getUserById.sql
-var getUserByIDQuery string
+//go:embed _query/user/get_user_by_id.sql
+var getUserByID string
 
 func (r *userRepository) UpdateUserInformation(
 	ctx context.Context,
@@ -37,7 +37,7 @@ func (r *userRepository) UpdateUserInformation(
 ) error {
 	_, err := r.conn.ExecContext(
 		ctx,
-		updateUserInformationQuery,
+		updateUserInformation,
 		&accountInformation.Username,
 		&accountInformation.Biography,
 		&accountInformation.ID,
@@ -51,7 +51,7 @@ func (r *userRepository) UpdateUserInformation(
 
 func (r *userRepository) GetUserById(ctx context.Context, id int64) (*entities.User, error) {
 	var user entities.User
-	row := r.conn.QueryRowContext(ctx, getUserByIDQuery, id)
+	row := r.conn.QueryRowContext(ctx, getUserByID, id)
 	err := row.Scan(
 		&user.ID,
 		&user.Name,
