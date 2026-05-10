@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
@@ -11,7 +12,7 @@ import (
 )
 
 func NewUserRepository(
-		settings repositories.SettingsRepository,
+	settings repositories.SettingsRepository,
 ) repositories.UserRepository {
 	return &userRepository{
 		conn:     settings.Connection(),
@@ -24,20 +25,19 @@ type userRepository struct {
 	settings repositories.SettingsRepository
 }
 
-func (r *userRepository) UpdateUserInformation(
-		ctx context.Context,
-		accountInformation entities.UserInformation,
-) error {
-	const query = `
-	UPDATE users
-	SET username = ?,
-		biography = ?
-	WHERE id = ?
-	`
+//go:embed _query/user/update_user_information.sql
+var updateUserInformation string
 
+//go:embed _query/user/get_user_by_id.sql
+var getUserByID string
+
+func (r *userRepository) UpdateUserInformation(
+	ctx context.Context,
+	accountInformation entities.UserInformation,
+) error {
 	_, err := r.conn.ExecContext(
 		ctx,
-		query,
+		updateUserInformation,
 		&accountInformation.Username,
 		&accountInformation.Biography,
 		&accountInformation.ID,
@@ -50,19 +50,8 @@ func (r *userRepository) UpdateUserInformation(
 }
 
 func (r *userRepository) GetUserById(ctx context.Context, id int64) (*entities.User, error) {
-	const query = `
-	SELECT 
-    	id, 
-    	name, 
-    	email,  
-    	carbo_coins, 
-    	carbon, 
-    	traveled_distance 
-	FROM users WHERE id = ?
-	`
-
 	var user entities.User
-	row := r.conn.QueryRowContext(ctx, query, id)
+	row := r.conn.QueryRowContext(ctx, getUserByID, id)
 	err := row.Scan(
 		&user.ID,
 		&user.Name,

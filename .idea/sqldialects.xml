@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/auth/attempt_complete_register.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/auth/attempt_register.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/auth/check_user_credential.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/auth/get_user_by_email.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/auth/get_user_by_id.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/product/add_new_product.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/product/delete_product.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/product/get_product_by_id.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/product/get_products.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/product/update_product.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/user/get_user_by_id.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/infrastructure/datastore/repositories/impl/_query/user/update_user_information.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/scripts/sql/create.sql" dialect="MySQL" />
   </component>
 </project>

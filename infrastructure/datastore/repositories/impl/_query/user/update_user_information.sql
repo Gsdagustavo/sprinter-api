@@ -1,0 +1,1 @@
+UPDATE users SET username = ?, biography = ? WHERE id = ?

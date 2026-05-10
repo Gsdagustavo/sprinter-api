@@ -1,0 +1,1 @@
+UPDATE products SET status_code = 1 WHERE id = ?

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
 
 	"github.com/Gsdagustavo/sprinter-api/domain/entities"
@@ -23,23 +24,27 @@ type authenticationRepository struct {
 	settings repositories.SettingsRepository
 }
 
-func (r authenticationRepository) GetUserByEmail(
-		ctx context.Context,
-		email string,
-) (*entities.User, error) {
-	const query = `
-	SELECT 
-    	id, 
-    	name, 
-    	email,  
-    	carbo_coins, 
-    	carbon, 
-    	traveled_distance 
-	FROM users WHERE email = ?
-	`
+//go:embed _query/auth/get_user_by_email.sql
+var getUserByEmail string
 
+//go:embed _query/auth/attempt_register.sql
+var attemptRegister string
+
+//go:embed _query/auth/check_user_credential.sql
+var checkUserCredential string
+
+//go:embed _query/auth/get_user_by_id.sql
+var getUserById string
+
+//go:embed _query/auth/attempt_complete_register.sql
+var attemptCompleteRegister string
+
+func (r authenticationRepository) GetUserByEmail(
+	ctx context.Context,
+	email string,
+) (*entities.User, error) {
 	var user entities.User
-	row := r.conn.QueryRowContext(ctx, query, email)
+	row := r.conn.QueryRowContext(ctx, getUserByEmail, email)
 	err := row.Scan(
 		&user.ID,
 		&user.Name,
@@ -60,14 +65,12 @@ func (r authenticationRepository) GetUserByEmail(
 }
 
 func (r authenticationRepository) AttemptRegister(
-		ctx context.Context,
-		credentials entities.UserCredentials,
+	ctx context.Context,
+	credentials entities.UserCredentials,
 ) (int64, error) {
-	const query = `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`
-
 	result, err := r.conn.ExecContext(
 		ctx,
-		query,
+		attemptRegister,
 		credentials.Name,
 		credentials.Email,
 		credentials.Password,
@@ -85,17 +88,11 @@ func (r authenticationRepository) AttemptRegister(
 }
 
 func (r authenticationRepository) CheckUserCredentials(
-		ctx context.Context,
-		credentials entities.UserCredentials,
+	ctx context.Context,
+	credentials entities.UserCredentials,
 ) (bool, error) {
-	query := `
-	SELECT password 
-	FROM users
-	WHERE email = ?
-	`
-
 	var password string
-	err := r.conn.QueryRowContext(ctx, query, credentials.Email).Scan(&password)
+	err := r.conn.QueryRowContext(ctx, checkUserCredential, credentials.Email).Scan(&password)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, derr.NotFoundError
@@ -109,22 +106,11 @@ func (r authenticationRepository) CheckUserCredentials(
 }
 
 func (r authenticationRepository) GetUserByID(
-		ctx context.Context,
-		userID int64,
+	ctx context.Context,
+	userID int64,
 ) (*entities.User, error) {
-	const query = `
-	SELECT 
-    	id, 
-    	name, 
-    	email,  
-    	carbo_coins, 
-    	carbon, 
-    	traveled_distance 
-	FROM users WHERE id = ?
-	`
-
 	var user entities.User
-	row := r.conn.QueryRowContext(ctx, query, userID)
+	row := r.conn.QueryRowContext(ctx, getUserById, userID)
 	err := row.Scan(
 		&user.ID,
 		&user.Name,
@@ -145,14 +131,12 @@ func (r authenticationRepository) GetUserByID(
 }
 
 func (r authenticationRepository) AttemptCompleteRegistration(
-		ctx context.Context,
-		information entities.UserInformation,
+	ctx context.Context,
+	information entities.UserInformation,
 ) error {
-	const query = `UPDATE users SET username = ?, biography = ? WHERE id = ?`
-
 	_, err := r.conn.ExecContext(
 		ctx,
-		query,
+		attemptCompleteRegister,
 		information.Username,
 		information.Biography,
 	)
