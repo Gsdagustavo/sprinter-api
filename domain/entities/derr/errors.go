@@ -28,3 +28,11 @@ var (
 	InvalidProductStock       = NewClientError("INVALID_PRODUCT_STOCK", "Invalid product stock")
 	InvalidProductDiscount    = NewClientError("INVALID_PRODUCT_DISCOUNT", "Invalid product discount")
 )
+
+var (
+	InvalidActivityType      = NewClientError("INVALID_ACTIVITY_TYPE", "Invalid activity type")
+	InvalidActivityStartDate = NewClientError("INVALID_ACTIVITY_START_DATE", "Invalid activity start date")
+	InvalidActivityEndDate   = NewClientError("INVALID_ACTIVITY_END_DATE", "Invalid activity end date")
+	InvalidActivityRoute     = NewClientError("INVALID_ACTIVITY_ROUTE", "Invalid activity route")
+	InvalidActivityPoint     = NewClientError("INVALID_ACTIVITY_POINT", "Invalid activity point")
+)

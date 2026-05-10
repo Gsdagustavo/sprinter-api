@@ -39,3 +39,27 @@ CREATE TABLE products
     modified_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_product_status_code (status_code)
 );
+
+CREATE TABLE activities (
+    id          INT PRIMARY KEY AUTO_INCREMENT,
+    id_user     INT      NOT NULL,
+    type        INT      NOT NULL,
+    start_date  DATETIME NOT NULL,
+    end_date    DATETIME NULL,
+    status_code INT      NOT NULL DEFAULT 0,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_id_user (id_user)
+);
+
+CREATE TABLE points (
+    id          INT PRIMARY KEY AUTO_INCREMENT,
+    id_activity INT NOT NULL,
+    latitude    DOUBLE NOT NULL,
+    longitude   DOUBLE NOT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_points_activity FOREIGN KEY (id_activity) REFERENCES activities(id) ON DELETE CASCADE,
+    INDEX idx_id_activity (id_activity)
+);

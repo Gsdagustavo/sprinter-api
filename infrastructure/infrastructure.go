@@ -35,21 +35,25 @@ func SetupModules(r *mux.Router, settings entities.Settings) error {
 	authRepository := repositories.NewAuthenticationRepository(settingsRepository)
 	productRepository := repositories.NewProductRepository(settingsRepository)
 	userRepository := repositories.NewUserRepository(settingsRepository)
+	activityRepository := repositories.NewActivityRepository(settingsRepository)
 
 	// Use Cases
 	authUseCases := usecases.NewAuthenticationUseCase(authRepository, settings.PasetoSettings.SecurityKey, fileStorage, mailSender)
 	userUseCases := usecases.NewUserUseCases(fileStorage, settings.FileStorageSettings, userRepository)
 	productUseCases := usecases.NewProductUseCases(productRepository)
+	activityUsecases := usecases.NewActivityUseCases(activityRepository)
 
 	// Modules
 	authModule := modules.NewAuthModule(authUseCases)
 	productModule := modules.NewProductModule(productUseCases)
 	userModule := modules.NewUserModule(userUseCases)
+	activityModule := modules.NewActivityModule(activityUsecases)
 
 	modules := []router.Module{
 		authModule,
 		productModule,
 		userModule,
+		activityModule,
 	}
 
 	apiSubRouter := r.PathPrefix("/api").Subrouter()
