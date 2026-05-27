@@ -57,12 +57,12 @@ func (m authModule) Routes() []router.RouteDefinition {
 			HttpMethods: []string{http.MethodPost},
 			Public:      true,
 		},
-        {
-            Path:        "/me",
-            Description: "Attempt get user information",
-            Handler:     m.me,
-            HttpMethods: []string{http.MethodGet},
-        },
+		{
+			Path:        "/me",
+			Description: "Attempt get user information",
+			Handler:     m.me,
+			HttpMethods: []string{http.MethodGet},
+		},
 		{
 			Path:        "/completeRegistration",
 			Description: "Attempt complete user registration",
@@ -214,10 +214,14 @@ func (m authModule) register(w http.ResponseWriter, r *http.Request) {
 func (m authModule) me(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	authHeader := r.Header.Get("Authorization")
-	token := strings.TrimPrefix(authHeader, "Bearer ")
+	token, err := router.GetToken(r)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get the token", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
 
-	response, err := m.authUseCases.GetUserByToken(ctx, token)
+	response, err := m.authUseCases.GetUserByToken(ctx, *token)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to get the user information", logger.Err(err))
 		router.HandleError(w, err)
