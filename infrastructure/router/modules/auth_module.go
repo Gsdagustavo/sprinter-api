@@ -213,7 +213,6 @@ func (m authModule) register(w http.ResponseWriter, r *http.Request) {
 
 func (m authModule) me(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
 	token, err := router.GetToken(r)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to get the token", logger.Err(err))
