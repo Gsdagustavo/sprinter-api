@@ -45,6 +45,16 @@ func GetUser(r *http.Request) (*entities.User, error) {
 	return user, nil
 }
 
+// GetToken attempts to get the bearer token from the request
+func GetToken(r *http.Request) (*string, error) {
+	authHeader := r.Header.Get("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	if token == "" {
+		return nil, derr.UnauthorizedError
+	}
+	return &token, nil
+}
+
 // GetDefaultFilterFromParams returns a default filter entity from the given HTTP request.
 func GetDefaultFilterFromParams(r *http.Request) (*entities.GeneralFilter, error) {
 	var filter entities.GeneralFilter
