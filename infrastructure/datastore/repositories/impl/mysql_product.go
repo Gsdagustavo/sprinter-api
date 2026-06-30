@@ -173,3 +173,54 @@ func (r productRepository) GetProducts(
 		Pages:          pages,
 	}, nil
 }
+
+func (r productRepository) GetProductsByCursor(
+	ctx context.Context,
+	filter entities.CursorFilter,
+) (*entities.CursorPaginatedList[entities.Product], error) {
+	query := getProducts + " AND id > ? ORDER BY id ASC LIMIT ?"
+	rows, err := r.conn.QueryContext(ctx, query, filter.Cursor, filter.Limit+1)
+	if err != nil {
+		return nil, derr.JoinError("failed to execute query", err)
+	}
+	defer rows.Close()
+
+	products := make([]entities.Product, 0)
+	for rows.Next() {
+		var product entities.Product
+		err = rows.Scan(
+			&product.ID,
+			&product.Name,
+			&product.Description,
+			&product.Price,
+			&product.Stock,
+			&product.ImageURL,
+		)
+		if err != nil {
+			return nil, derr.JoinError("failed to scan", err)
+		}
+
+		products = append(products, product)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, derr.JoinError("failed to iterate rows", err)
+	}
+
+	hasNext := int64(len(products)) > filter.Limit
+	if hasNext {
+		products = products[:filter.Limit]
+	}
+
+	var nextCursor *int64
+	if hasNext && len(products) > 0 {
+		cursor := products[len(products)-1].ID
+		nextCursor = &cursor
+	}
+
+	return &entities.CursorPaginatedList[entities.Product]{
+		Items:          products,
+		RequestedItems: filter.Limit,
+		HasNext:        hasNext,
+		NextCursor:     nextCursor,
+	}, nil
+}
