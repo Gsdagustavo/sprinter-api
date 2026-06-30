@@ -117,19 +117,21 @@ func (r productRepository) GetProducts(
 	ctx context.Context,
 	filter entities.GeneralFilter,
 ) (*entities.PaginatedList[entities.Product], error) {
+	query := getProducts
 	ordination := filter.Ordination
 	switch filter.OrderBy {
 	case "name":
-		getProducts += " ORDER BY name " + ordination
+		query += " ORDER BY name " + ordination
 	case "price":
-		getProducts += " ORDER BY price " + ordination
+		query += " ORDER BY price " + ordination
 	case "stock":
-		getProducts += " ORDER BY stock " + ordination
+		query += " ORDER BY stock " + ordination
 	}
 
-	getProducts = datastore.GetPaginated(getProducts, filter)
+	countQuery := datastore.GetQueryCount(query)
+	query = datastore.GetPaginated(query, filter)
 
-	rows, err := r.conn.QueryContext(ctx, getProducts)
+	rows, err := r.conn.QueryContext(ctx, query)
 	if err != nil {
 		return nil, derr.JoinError("failed to execute query", err)
 	}
@@ -152,8 +154,9 @@ func (r productRepository) GetProducts(
 
 		products = append(products, product)
 	}
-
-	countQuery := datastore.GetQueryCount(getProducts)
+	if err = rows.Err(); err != nil {
+		return nil, derr.JoinError("failed to iterate rows", err)
+	}
 
 	var totalCount int64
 	err = r.conn.QueryRowContext(ctx, countQuery).Scan(&totalCount)
