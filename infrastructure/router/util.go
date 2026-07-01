@@ -103,3 +103,39 @@ func GetDefaultFilterFromParams(r *http.Request) (*entities.GeneralFilter, error
 
 	return &filter, nil
 }
+
+// GetCursorFilterFromParams returns a cursor filter entity from the given HTTP request.
+func GetCursorFilterFromParams(r *http.Request) (*entities.CursorFilter, error) {
+	var filter entities.CursorFilter
+	query := r.URL.Query()
+
+	limitStr := query.Get("limit")
+	if limitStr != "" {
+		limit, err := strconv.ParseInt(limitStr, 0, 64)
+		if err != nil {
+			return nil, derr.NewBadRequestError("failed to get limit parameter")
+		}
+
+		filter.Limit = limit
+	}
+
+	cursorStr := query.Get("cursor")
+	if cursorStr != "" {
+		cursor, err := strconv.ParseInt(cursorStr, 0, 64)
+		if err != nil {
+			return nil, derr.NewBadRequestError("failed to get cursor parameter")
+		}
+
+		filter.Cursor = cursor
+	}
+
+	if filter.Limit <= 0 {
+		filter.Limit = defaultLimit
+	}
+
+	if filter.Cursor < 0 {
+		return nil, derr.NewBadRequestError("cursor must be greater than or equal to zero")
+	}
+
+	return &filter, nil
+}

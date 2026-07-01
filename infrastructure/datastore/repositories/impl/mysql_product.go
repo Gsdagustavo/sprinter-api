@@ -35,9 +35,6 @@ var updateProduct string
 //go:embed _query/product/get_product_by_id.sql
 var getProductById string
 
-//go:embed _query/product/get_products.sql
-var getProducts string
-
 func (r productRepository) AddNewProduct(ctx context.Context, product *entities.Product) (int64, error) {
 	res, err := r.conn.ExecContext(
 		ctx,
@@ -117,19 +114,31 @@ func (r productRepository) GetProducts(
 	ctx context.Context,
 	filter entities.GeneralFilter,
 ) (*entities.PaginatedList[entities.Product], error) {
+	query := `
+	SELECT
+    id,
+    name,
+    description,
+    price,
+    stock,
+    image_url
+FROM products
+WHERE status_code = 0
+`
 	ordination := filter.Ordination
 	switch filter.OrderBy {
 	case "name":
-		getProducts += " ORDER BY name " + ordination
+		query += " ORDER BY name " + ordination
 	case "price":
-		getProducts += " ORDER BY price " + ordination
+		query += " ORDER BY price " + ordination
 	case "stock":
-		getProducts += " ORDER BY stock " + ordination
+		query += " ORDER BY stock " + ordination
 	}
 
-	getProducts = datastore.GetPaginated(getProducts, filter)
+	countQuery := datastore.GetQueryCount(query)
+	query = datastore.GetPaginated(query, filter)
 
-	rows, err := r.conn.QueryContext(ctx, getProducts)
+	rows, err := r.conn.QueryContext(ctx, query)
 	if err != nil {
 		return nil, derr.JoinError("failed to execute query", err)
 	}
@@ -153,8 +162,6 @@ func (r productRepository) GetProducts(
 		products = append(products, product)
 	}
 
-	countQuery := datastore.GetQueryCount(getProducts)
-
 	var totalCount int64
 	err = r.conn.QueryRowContext(ctx, countQuery).Scan(&totalCount)
 	if err != nil {
@@ -168,5 +175,63 @@ func (r productRepository) GetProducts(
 		RequestedItems: filter.Limit,
 		TotalCount:     totalCount,
 		Pages:          pages,
+	}, nil
+}
+
+func (r productRepository) GetProductsByCursor(
+	ctx context.Context,
+	filter entities.CursorFilter,
+) (*entities.CursorPaginatedList[entities.Product], error) {
+	query := `
+	SELECT
+    id,
+    name,
+    description,
+    price,
+    stock,
+    image_url
+FROM products
+WHERE status_code = 0
+` + " AND id > ? ORDER BY id ASC LIMIT ?"
+	rows, err := r.conn.QueryContext(ctx, query, filter.Cursor, filter.Limit+1)
+	if err != nil {
+		return nil, derr.JoinError("failed to execute query", err)
+	}
+	defer rows.Close()
+
+	products := make([]entities.Product, 0)
+	for rows.Next() {
+		var product entities.Product
+		err = rows.Scan(
+			&product.ID,
+			&product.Name,
+			&product.Description,
+			&product.Price,
+			&product.Stock,
+			&product.ImageURL,
+		)
+		if err != nil {
+			return nil, derr.JoinError("failed to scan", err)
+		}
+
+		products = append(products, product)
+	}
+
+	hasNext := int64(len(products)) > filter.Limit
+	if hasNext {
+		products = products[:filter.Limit]
+	}
+
+	var nextCursor *int64
+	if hasNext && len(products) > 0 {
+		cursor := products[len(products)-1].ID
+		nextCursor = &cursor
+	}
+
+	return &entities.CursorPaginatedList[entities.Product]{
+		Items:          products,
+		RequestedItems: filter.Limit,
+		HasNext:        hasNext,
+		NextCursor:     nextCursor,
 	}, nil
 }

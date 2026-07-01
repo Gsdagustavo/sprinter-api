@@ -21,8 +21,8 @@ type productUseCases struct {
 }
 
 func (p productUseCases) AddNewProduct(
-		ctx context.Context,
-		product *entities.Product,
+	ctx context.Context,
+	product *entities.Product,
 ) (int64, error) {
 	err := rules.ValidateProduct(product)
 	if err != nil {
@@ -37,8 +37,8 @@ func (p productUseCases) DeleteProduct(ctx context.Context, id int64) error {
 }
 
 func (p productUseCases) UpdateProduct(
-		ctx context.Context,
-		product *entities.Product,
+	ctx context.Context,
+	product *entities.Product,
 ) error {
 	err := rules.ValidateProduct(product)
 	if err != nil {
@@ -49,19 +49,31 @@ func (p productUseCases) UpdateProduct(
 }
 
 func (p productUseCases) GetProductByID(
-		ctx context.Context,
-		id int64,
+	ctx context.Context,
+	id int64,
 ) (*entities.Product, error) {
 	return p.repository.GetProductByID(ctx, id)
 }
 
 func (p productUseCases) GetProducts(
-		ctx context.Context,
-		filter entities.GeneralFilter,
+	ctx context.Context,
+	filter entities.GeneralFilter,
 ) (*entities.PaginatedList[entities.Product], error) {
 	products, err := p.repository.GetProducts(ctx, filter)
 	if err != nil {
 		return nil, derr.JoinError("failed to get products", err)
+	}
+
+	return products, nil
+}
+
+func (p productUseCases) GetProductsByCursor(
+	ctx context.Context,
+	filter entities.CursorFilter,
+) (*entities.CursorPaginatedList[entities.Product], error) {
+	products, err := p.repository.GetProductsByCursor(ctx, filter)
+	if err != nil {
+		return nil, derr.JoinError("failed to get products by cursor", err)
 	}
 
 	return products, nil
