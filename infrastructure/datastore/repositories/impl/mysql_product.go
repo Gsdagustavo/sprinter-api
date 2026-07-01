@@ -161,9 +161,6 @@ WHERE status_code = 0
 
 		products = append(products, product)
 	}
-	if err = rows.Err(); err != nil {
-		return nil, derr.JoinError("failed to iterate rows", err)
-	}
 
 	var totalCount int64
 	err = r.conn.QueryRowContext(ctx, countQuery).Scan(&totalCount)
@@ -218,9 +215,6 @@ WHERE status_code = 0
 		}
 
 		products = append(products, product)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, derr.JoinError("failed to iterate rows", err)
 	}
 
 	hasNext := int64(len(products)) > filter.Limit
