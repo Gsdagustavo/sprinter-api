@@ -35,9 +35,6 @@ var updateProduct string
 //go:embed _query/product/get_product_by_id.sql
 var getProductById string
 
-//go:embed _query/product/get_products.sql
-var getProducts string
-
 func (r productRepository) AddNewProduct(ctx context.Context, product *entities.Product) (int64, error) {
 	res, err := r.conn.ExecContext(
 		ctx,
@@ -117,7 +114,17 @@ func (r productRepository) GetProducts(
 	ctx context.Context,
 	filter entities.GeneralFilter,
 ) (*entities.PaginatedList[entities.Product], error) {
-	query := getProducts
+	query := `
+	SELECT
+    id,
+    name,
+    description,
+    price,
+    stock,
+    image_url
+FROM products
+WHERE status_code = 0
+`
 	ordination := filter.Ordination
 	switch filter.OrderBy {
 	case "name":
@@ -178,7 +185,17 @@ func (r productRepository) GetProductsByCursor(
 	ctx context.Context,
 	filter entities.CursorFilter,
 ) (*entities.CursorPaginatedList[entities.Product], error) {
-	query := getProducts + " AND id > ? ORDER BY id ASC LIMIT ?"
+	query := `
+	SELECT
+    id,
+    name,
+    description,
+    price,
+    stock,
+    image_url
+FROM products
+WHERE status_code = 0
+` + " AND id > ? ORDER BY id ASC LIMIT ?"
 	rows, err := r.conn.QueryContext(ctx, query, filter.Cursor, filter.Limit+1)
 	if err != nil {
 		return nil, derr.JoinError("failed to execute query", err)
