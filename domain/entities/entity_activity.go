@@ -2,14 +2,21 @@ package entities
 
 import "time"
 
-type ActivityType int64
+// ActivityType represents the kind of physical activity done by the user
+type ActivityType string
 
 const (
-	CYCLING ActivityType = 1
-	RUNNING ActivityType = 2
-	WALKING ActivityType = 3
+	// Cycling represents an activity done by bicycle
+	Cycling ActivityType = "CYCLING"
+
+	// Running represents an activity done by running
+	Running ActivityType = "RUNNING"
+
+	// Walking represents an activity done by walking
+	Walking ActivityType = "WALKING"
 )
 
+// Activity represents a physical activity done by a user
 type Activity struct {
 	// ID is the unique identifier of the activity
 	ID int64 `json:"id,omitempty"`

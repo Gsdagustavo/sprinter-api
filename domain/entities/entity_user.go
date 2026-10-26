@@ -5,6 +5,7 @@ import "time"
 // CarboCoin is a unitary value that represents the base currency for the application.
 type CarboCoin int64
 
+// User represents a user of the application.
 type User struct {
 	// ID is the unique identifier of the user.
 	ID int64 `json:"id,omitempty"`
