@@ -2,6 +2,7 @@ package entities
 
 import "time"
 
+// Point represents a geographic coordinate that is part of an activity route
 type Point struct {
 	// ID is the unique identifier of the point
 	ID int64 `json:"id,omitempty"`

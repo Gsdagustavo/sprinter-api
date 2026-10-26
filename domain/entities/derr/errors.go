@@ -18,13 +18,11 @@ var (
 	BiographyIsTooLong = NewClientError("BIOGRAPHY_IS_TOO_LONG", "Biography is too long")
 	NameIsTooShort     = NewClientError("NAME_IS_TOO_SHORT", "Name is too short")
 	NameIsTooLong      = NewClientError("NAME_IS_TOO_LONG", "Name is too long")
-	WeakPassword       = NewClientError("WEAK_PASSWORD", "Weak password")
-)
+	WeakPassword       = NewClientError("WEAK_PASSWORD", "Weak password"))
 
 var (
 	InvalidProductName        = NewClientError("INVALID_PRODUCT_NAME", "Invalid product name")
 	InvalidProductDescription = NewClientError("INVALID_DESCRIPTION", "Invalid product description")
 	InvalidProductPrice       = NewClientError("INVALID_PRODUCT_PRICE", "Invalid product price")
 	InvalidProductStock       = NewClientError("INVALID_PRODUCT_STOCK", "Invalid product stock")
-	InvalidProductDiscount    = NewClientError("INVALID_PRODUCT_DISCOUNT", "Invalid product discount")
-)
+	InvalidProductDiscount    = NewClientError("INVALID_PRODUCT_DISCOUNT", "Invalid product discount"))
