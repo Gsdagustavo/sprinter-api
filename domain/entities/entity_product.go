@@ -29,6 +29,23 @@ type Product struct {
 	ModifiedAt time.Time `json:"modified_at,omitempty"`
 }
 
+// ProductStatusCode represents the different possible products status code
+type ProductStatusCode int
+
+// ProductStatusCode represents the different possible products status code
+const (
+	// Represents the product available status code
+	available ProductStatusCode = iota
+	// Represents the product without stock status code
+	withoutStock
+	// Represents the product unavailable status code
+	unavailable
+	/// Represents the product discontinued status code
+	discontinued
+	/// Represents the product promotion status code
+	promotion
+)
+
 // CartItem represents an item in a shopping cart.
 type CartItem struct {
 	// ID is the unique identifier of the product in cart

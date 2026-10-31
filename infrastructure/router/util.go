@@ -3,7 +3,9 @@ package router
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -95,28 +97,24 @@ func GetDefaultFilterFromParams(r *http.Request) (*entities.GeneralFilter, error
 }
 
 // GetCursorFilterFromParams returns a cursor filter entity from the given HTTP request.
-func GetCursorFilterFromParams(r *http.Request) (*entities.CursorFilter, error) {
-	var filter entities.CursorFilter
+func GetCursorFilterFromParams(
+	r *http.Request,
+) (*entities.CursorFilter, error) {
 	query := r.URL.Query()
 
-	limitStr := query.Get("limit")
-	if limitStr != "" {
-		limit, err := strconv.ParseInt(limitStr, 0, 64)
-		if err != nil {
-			return nil, derr.NewBadRequestError("failed to get limit parameter")
-		}
-
-		filter.Limit = limit
+	limit, err := ParseQueryParam(query, "limit", ParseInt64)
+	if err != nil {
+		return nil, err
 	}
 
-	cursorStr := query.Get("cursor")
-	if cursorStr != "" {
-		cursor, err := strconv.ParseInt(cursorStr, 0, 64)
-		if err != nil {
-			return nil, derr.NewBadRequestError("failed to get cursor parameter")
-		}
+	cursor, err := ParseQueryParam(query, "cursor", ParseInt64)
+	if err != nil {
+		return nil, err
+	}
 
-		filter.Cursor = cursor
+	filter := entities.CursorFilter{
+		Limit:  limit,
+		Cursor: cursor,
 	}
 
 	if filter.Limit <= 0 {
@@ -124,8 +122,38 @@ func GetCursorFilterFromParams(r *http.Request) (*entities.CursorFilter, error) 
 	}
 
 	if filter.Cursor < 0 {
-		return nil, derr.NewBadRequestError("cursor must be greater than or equal to zero")
+		return nil, derr.NewBadRequestError(
+			"cursor must be greater than or equal to zero",
+		)
 	}
 
 	return &filter, nil
+}
+
+// ParseInt64 is the int64 declaration of the parsed param
+func ParseInt64(value string) (int64, error) {
+	return strconv.ParseInt(value, 10, 64)
+}
+
+// ParseQueryParam attempts to parse the query param with the given information
+func ParseQueryParam[T any](
+	query url.Values,
+	key string,
+	parser func(string) (T, error),
+) (T, error) {
+	var zero T
+
+	value := query.Get(key)
+	if value == "" {
+		return zero, nil
+	}
+
+	parsed, err := parser(value)
+	if err != nil {
+		return zero, derr.NewBadRequestError(
+			fmt.Sprintf("failed to parse %s parameter", key),
+		)
+	}
+
+	return parsed, nil
 }

@@ -5,9 +5,6 @@ type PaginatedList[T any] struct {
 	// The list of items in.
 	Items []T `json:"items"`
 
-	// RequestedItems is the number of items that the client requested for.
-	RequestedItems int64 `json:"requested_items"`
-
 	// TotalCount is the total number of items in the database that match the given criteria
 	TotalCount int64 `json:"total_count"`
 
@@ -27,7 +24,7 @@ type CursorPaginatedList[T any] struct {
 	HasNext bool `json:"has_next"`
 
 	// NextCursor is the cursor that should be used to request the next page.
-	NextCursor *int64 `json:"next_cursor,omitempty"`
+	NextCursor *int64 `json:"next_cursor"`
 }
 
 // GeneralFilter is a generic struct that defines basic fields for pagination, sorting and filtering.

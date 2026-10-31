@@ -122,8 +122,8 @@ func (r productRepository) GetProducts(
     price,
     stock,
     image_url
-FROM products
-WHERE status_code = 0
+	FROM products
+	WHERE status_code = 0
 `
 	ordination := filter.Ordination
 	switch filter.OrderBy {
@@ -142,7 +142,12 @@ WHERE status_code = 0
 	if err != nil {
 		return nil, derr.JoinError("failed to execute query", err)
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+
+		}
+	}(rows)
 
 	products := make([]entities.Product, 0)
 	for rows.Next() {
@@ -171,10 +176,9 @@ WHERE status_code = 0
 	pages := datastore.GetTotalPages(totalCount, filter)
 
 	return &entities.PaginatedList[entities.Product]{
-		Items:          products,
-		RequestedItems: filter.Limit,
-		TotalCount:     totalCount,
-		Pages:          pages,
+		Items:      products,
+		TotalCount: totalCount,
+		Pages:      pages,
 	}, nil
 }
 
@@ -183,21 +187,28 @@ func (r productRepository) GetProductsByCursor(
 	filter entities.CursorFilter,
 ) (*entities.CursorPaginatedList[entities.Product], error) {
 	query := `
-	SELECT
-    id,
-    name,
-    description,
-    price,
-    stock,
-    image_url
-FROM products
-WHERE status_code = 0
-` + " AND id > ? ORDER BY id ASC LIMIT ?"
+		select * from (SELECT
+		id,
+		name,
+		description,
+		price,
+		stock,
+		image_url
+		FROM products
+		WHERE status_code = 0
+		AND id > ? ORDER BY id ASC)
+		p LIMIT ?
+	`
 	rows, err := r.conn.QueryContext(ctx, query, filter.Cursor, filter.Limit+1)
 	if err != nil {
 		return nil, derr.JoinError("failed to execute query", err)
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+
+		}
+	}(rows)
 
 	products := make([]entities.Product, 0)
 	for rows.Next() {

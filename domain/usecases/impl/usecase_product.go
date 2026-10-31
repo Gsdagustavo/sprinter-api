@@ -22,14 +22,14 @@ type productUseCases struct {
 
 func (p productUseCases) AddNewProduct(
 	ctx context.Context,
-	product *entities.Product,
+	product entities.Product,
 ) (int64, error) {
-	err := rules.ValidateProduct(product)
+	err := rules.ValidateProduct(&product)
 	if err != nil {
 		return 0, err
 	}
 
-	return p.repository.AddNewProduct(ctx, product)
+	return p.repository.AddNewProduct(ctx, &product)
 }
 
 func (p productUseCases) DeleteProduct(ctx context.Context, id int64) error {
@@ -38,21 +38,21 @@ func (p productUseCases) DeleteProduct(ctx context.Context, id int64) error {
 
 func (p productUseCases) UpdateProduct(
 	ctx context.Context,
-	product *entities.Product,
+	product entities.Product,
 ) error {
-	err := rules.ValidateProduct(product)
+	err := rules.ValidateProduct(&product)
 	if err != nil {
 		return err
 	}
 
-	return p.repository.UpdateProduct(ctx, product)
+	return p.repository.UpdateProduct(ctx, &product)
 }
 
 func (p productUseCases) GetProductByID(
 	ctx context.Context,
-	id int64,
+	productId int64,
 ) (*entities.Product, error) {
-	return p.repository.GetProductByID(ctx, id)
+	return p.repository.GetProductByID(ctx, productId)
 }
 
 func (p productUseCases) GetProducts(
