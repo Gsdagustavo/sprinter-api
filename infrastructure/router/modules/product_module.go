@@ -39,7 +39,14 @@ func (m productModule) Routes() []router.RouteDefinition {
 			Description: "List products",
 			Handler:     m.listProducts,
 			HttpMethods: []string{http.MethodGet},
-			Public: true,
+			Public:      true,
+		},
+		{
+			Path:        "/cursor",
+			Description: "List products by cursor",
+			Handler:     m.listProductsByCursor,
+			HttpMethods: []string{http.MethodGet},
+			Public:      true,
 		},
 	}
 }
@@ -61,6 +68,29 @@ func (m productModule) listProducts(w http.ResponseWriter, r *http.Request) {
 	products, err := m.productUseCases.GetProducts(ctx, *filter)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to get products", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	err = router.Write(w, products)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to write response", logger.Err(err))
+	}
+}
+
+func (m productModule) listProductsByCursor(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	filter, err := router.GetCursorFilterFromParams(r)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get cursor filter params", logger.Err(err))
+		router.HandleError(w, err)
+		return
+	}
+
+	products, err := m.productUseCases.GetProductsByCursor(ctx, *filter)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get products by cursor", logger.Err(err))
 		router.HandleError(w, err)
 		return
 	}

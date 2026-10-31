@@ -22,7 +22,13 @@ type ProductRepository interface {
 
 	// GetProducts returns a paginated list of products that match the given filter.
 	GetProducts(
-			ctx context.Context,
-			filter entities.GeneralFilter,
+		ctx context.Context,
+		filter entities.GeneralFilter,
 	) (*entities.PaginatedList[entities.Product], error)
+
+	// GetProductsByCursor returns a cursor paginated list of products.
+	GetProductsByCursor(
+		ctx context.Context,
+		filter entities.CursorFilter,
+	) (*entities.CursorPaginatedList[entities.Product], error)
 }

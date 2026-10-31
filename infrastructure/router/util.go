@@ -3,7 +3,9 @@ package router
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -102,4 +104,66 @@ func GetDefaultFilterFromParams(r *http.Request) (*entities.GeneralFilter, error
 	}
 
 	return &filter, nil
+}
+
+// GetCursorFilterFromParams returns a cursor filter entity from the given HTTP request.
+func GetCursorFilterFromParams(
+	r *http.Request,
+) (*entities.CursorFilter, error) {
+	query := r.URL.Query()
+
+	limit, err := ParseQueryParam(query, "limit", ParseInt64)
+	if err != nil {
+		return nil, err
+	}
+
+	cursor, err := ParseQueryParam(query, "cursor", ParseInt64)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := entities.CursorFilter{
+		Limit:  limit,
+		Cursor: cursor,
+	}
+
+	if filter.Limit <= 0 {
+		filter.Limit = defaultLimit
+	}
+
+	if filter.Cursor < 0 {
+		return nil, derr.NewBadRequestError(
+			"cursor must be greater than or equal to zero",
+		)
+	}
+
+	return &filter, nil
+}
+
+// ParseInt64 is the int64 declaration of the parsed param
+func ParseInt64(value string) (int64, error) {
+	return strconv.ParseInt(value, 10, 64)
+}
+
+// ParseQueryParam attempts to parse the query param with the given information
+func ParseQueryParam[T any](
+	query url.Values,
+	key string,
+	parser func(string) (T, error),
+) (T, error) {
+	var zero T
+
+	value := query.Get(key)
+	if value == "" {
+		return zero, nil
+	}
+
+	parsed, err := parser(value)
+	if err != nil {
+		return zero, derr.NewBadRequestError(
+			fmt.Sprintf("failed to parse %s parameter", key),
+		)
+	}
+
+	return parsed, nil
 }
